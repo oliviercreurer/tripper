@@ -177,7 +177,7 @@
                 background: var(--color-bg-primary);
                 color: var(--color-text-default);
                 -webkit-font-smoothing: antialiased;
-                transition: background .2s ease, color .2s ease;
+                transition: background .3s ease, color .3s ease;
             }
             ::-webkit-scrollbar {
                 width: 0;
@@ -277,12 +277,12 @@
             };
         </script>
         <script>
-            // Theme init — runs before React to avoid flash of wrong theme.
-            // Default to light; only apply dark if explicitly saved.
+            // Theme init — runs before React to avoid flash of wrong theme
             (function () {
                 var saved = null;
                 try { saved = localStorage.getItem("theme"); } catch (e) {}
-                if (saved === "dark") {
+                var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                if (saved === "dark" || (!saved && prefersDark)) {
                     document.documentElement.classList.add("dark");
                 }
             })();
@@ -1119,7 +1119,7 @@
                                 fill={pillBg}
                                 stroke={isComplete ? COMPLETE_TRACK : BORDER}
                                 strokeWidth={SW}
-                                style={{ transition: "fill .2s ease, stroke .2s ease" }}
+                                style={{ transition: "fill .6s ease, stroke .6s ease" }}
                             />
                             <path ref={pathRef} d={PILL_D} fill="none" stroke="none" />
                         </svg>
@@ -1224,7 +1224,7 @@
                                                           )
                                                         : BORDER
                                                 }
-                                                style={{ transition: "stroke .2s ease" }}
+                                                style={{ transition: "stroke .6s ease" }}
                                             />
                                         </svg>
                                         <span
@@ -1263,7 +1263,7 @@
                             lineHeight: small ? "18px" : "22px",
                             fontFeatureSettings: "'lnum' 1, 'tnum' 1",
                             transition:
-                                "background .2s ease, border-color .2s ease, color .2s ease",
+                                "background .3s ease, border-color .3s ease, color .3s ease",
                         }}
                     >
                         {text}
@@ -2697,10 +2697,8 @@
                 currentDay,
                 pillVisible,
                 accentBold,
-                accentBg,
                 autoFollow,
                 mapPadding,
-                isDark = false,
             }) {
                 const mapContainerRef = useRef(null);
                 const mapRef = useRef(null);
@@ -2710,8 +2708,6 @@
                 const pillVisibleRef = useRef(false);
                 const autoFollowRef = useRef(autoFollow);
                 const accentRef = useRef(accentBold);
-                const accentBgRef = useRef(accentBg);
-                const isDarkRef = useRef(isDark);
 
                 const mobilePad = mapPadding || undefined;
 
@@ -2725,7 +2721,7 @@
 
                     const map = new mapboxgl.Map({
                         container: mapContainerRef.current,
-                        style: "mapbox://styles/mapbox/standard",
+                        style: "mapbox://styles/ocreurer/cl6gp1l5t007k15pq6ol4bakv",
                         center: [-118.8, 55.12],
                         zoom: 9,
                         pitch: 0,
@@ -2741,16 +2737,6 @@
                     }
 
                     map.on("load", () => {
-                        // Set map light preset: day for light mode, night for dark
-                        map.setConfigProperty("basemap", "lightPreset",
-                            isDarkRef.current ? "night" : "day");
-                        // Use the same font as the rest of the UI
-                        map.setConfigProperty("basemap", "font", "Outfit");
-                        // Strip the map down — keep road labels, hide everything else
-                        map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
-                        map.setConfigProperty("basemap", "showTransitLabels", false);
-                        map.setConfigProperty("basemap", "showPlaceLabels", false);
-
                         // Register badge images using current accent color
                         function registerBadges(accent) {
                             const states = [
@@ -2837,7 +2823,6 @@
                             id: "stops-layer",
                             type: "symbol",
                             source: "stops",
-                            slot: "top",
                             layout: {
                                 "icon-image": ["get", "icon"],
                                 "icon-size": 1,
@@ -2851,31 +2836,33 @@
                             type: "geojson",
                             data: { type: "FeatureCollection", features: [] },
                         });
-                        // Fill + line layers in "top" slot with emissive-strength: 1
-                        // so Standard's night lighting doesn't tint our colors
-                        map.addLayer({
-                            id: "group-boundary-fill",
-                            type: "fill",
-                            source: "group-boundary",
-                            slot: "top",
-                            paint: {
-                                "fill-color": accentRef.current,
-                                "fill-opacity": 0.18,
-                                "fill-emissive-strength": 1,
+                        // Fill layer — add BEFORE stops-layer so badges render on top
+                        map.addLayer(
+                            {
+                                id: "group-boundary-fill",
+                                type: "fill",
+                                source: "group-boundary",
+                                paint: {
+                                    "fill-color": accentRef.current,
+                                    "fill-opacity": 0.08,
+                                },
                             },
-                        });
-                        map.addLayer({
-                            id: "group-boundary-line",
-                            type: "line",
-                            source: "group-boundary",
-                            slot: "top",
-                            paint: {
-                                "line-color": accentRef.current,
-                                "line-width": 4,
-                                "line-opacity": 0.85,
-                                "line-emissive-strength": 1,
+                            "stops-layer",
+                        );
+                        map.addLayer(
+                            {
+                                id: "group-boundary-line",
+                                type: "line",
+                                source: "group-boundary",
+                                paint: {
+                                    "line-color": accentRef.current,
+                                    "line-width": 2.5,
+                                    "line-opacity": 0.5,
+                                    "line-dasharray": [4, 3],
+                                },
                             },
-                        });
+                            "stops-layer",
+                        );
 
                         // Popup on click
                         map.on("click", "stops-layer", (e) => {
@@ -2922,23 +2909,18 @@
                     };
                 }, []);
 
-                // Update map badges, polygon colors, and light preset when theme or accent changes
+                // Re-register badges and update boundary colors when accent changes
                 useEffect(() => {
-                    isDarkRef.current = isDark;
                     accentRef.current = accentBold;
-                    accentBgRef.current = accentBg;
                     const map = mapRef.current;
                     if (map && readyRef.current) {
-                        map.setConfigProperty("basemap", "lightPreset",
-                            isDark ? "night" : "day");
-                        // Re-register badges and update polygon with theme-aware accent
                         if (map._registerBadges) map._registerBadges(accentBold);
                         if (map.getLayer("group-boundary-fill")) {
                             map.setPaintProperty("group-boundary-fill", "fill-color", accentBold);
                             map.setPaintProperty("group-boundary-line", "line-color", accentBold);
                         }
                     }
-                }, [isDark, accentBold, accentBg]);
+                }, [accentBold]);
 
                 // Track previous group for comparison
                 const prevGroupRef = useRef(null);
@@ -4246,8 +4228,6 @@
                     try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
                     // Re-read all CSS-variable-derived module-level constants
                     refreshThemeVars();
-                    // Update accent to the theme-appropriate default token
-                    setAccentHex(DEFAULT_ACCENT);
                     setIsDark(dark);
                 }, []);
 
@@ -4754,10 +4734,8 @@
                                         currentDay={currentDay}
                                         pillVisible={pillVisible || mobileView === "map"}
                                         accentBold={accent.bold}
-                                        accentBg={accent.bg}
                                         autoFollow={true}
                                         mapPadding={mapPadding}
-                                        isDark={isDark}
                                     />
                                     {/* Stop card carousel at bottom */}
                                     <MobileCardCarousel
@@ -4835,9 +4813,7 @@
                                     currentDay={currentDay}
                                     pillVisible={pillVisible}
                                     accentBold={accent.bold}
-                                    accentBg={accent.bg}
                                     autoFollow={autoFollow}
-                                    isDark={isDark}
                                 />
                                 <AutoFollowToggle
                                     enabled={autoFollow}
