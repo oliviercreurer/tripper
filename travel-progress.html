@@ -594,6 +594,10 @@
                 "https://www.figma.com/api/mcp/asset/60ea813a-af57-4deb-8c27-a338d24c9e12",
                 "https://www.figma.com/api/mcp/asset/dc9ac162-517c-4d67-9a47-d68380d508c0",
                 "https://www.figma.com/api/mcp/asset/d50efe0f-f2fe-410e-a33f-5cec03e3252f",
+                // Breakfast option images
+                "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&h=400&fit=crop",
+                "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=400&h=400&fit=crop",
+                "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop",
             ];
 
             // ─── Itinerary data (corrected addresses from Figma) ───────
@@ -708,7 +712,59 @@
                     distance: "84.3km",
                     items: [
                         {
-                            num: 6,
+                            type: "group",
+                            groupType: "options",
+                            label: "Breakfast Spots",
+                            tag: "Meal",
+                            desc: "Start your morning right with one of these local breakfast favourites in Grande Prairie. Each spot has its own vibe\u2014pick whichever suits your mood.",
+                            boundary: [
+                                [-118.815, 55.177],
+                                [-118.815, 55.166],
+                                [-118.793, 55.166],
+                                [-118.793, 55.177],
+                                [-118.815, 55.177],
+                            ],
+                            stops: [
+                                {
+                                    num: 6,
+                                    tag: "Meal",
+                                    title: "Brunch at Java Junction",
+                                    desc: "A cozy downtown café known for its farm-fresh eggs benedict and locally roasted coffee.",
+                                    biz: "Java Junction Café",
+                                    address: "10014 100 Avenue, Grande Prairie, AB",
+                                    phone: "(780) 814-2233",
+                                    img: IMG_STOP[9],
+                                    lat: 55.1712,
+                                    lng: -118.8058,
+                                },
+                                {
+                                    num: 7,
+                                    tag: "Meal",
+                                    title: "Classic breakfast at Earlybird",
+                                    desc: "No-frills, hearty breakfast plates with generous portions and bottomless coffee.",
+                                    biz: "Earlybird Breakfast Co.",
+                                    address: "11202 100 Street, Grande Prairie, AB",
+                                    phone: "(780) 402-1188",
+                                    img: IMG_STOP[10],
+                                    lat: 55.1735,
+                                    lng: -118.7983,
+                                },
+                                {
+                                    num: 8,
+                                    tag: "Meal",
+                                    title: "Pastries at Prairie Flour",
+                                    desc: "Artisan bakery with freshly baked croissants, sourdough, and seasonal pastries.",
+                                    biz: "Prairie Flour Bakery",
+                                    address: "9907 101 Avenue, Grande Prairie, AB",
+                                    phone: "(780) 538-4455",
+                                    img: IMG_STOP[11],
+                                    lat: 55.1721,
+                                    lng: -118.8011,
+                                },
+                            ],
+                        },
+                        {
+                            num: 9,
                             tag: "Meal",
                             title: "Start your day at Stolen Harvest with some of Alberta\u2019s finest, hand-crafted meads",
                             desc: "Experience Stolen Harvest Meadery\u2019s hand-crafted Alberta meads made from local honey and foraged ingredients. Enjoy intimate tastings, seasonal flavours, and a light lunch in our Grovedale countryside setting. Tastings by appointment only.",
@@ -753,7 +809,7 @@
                             center: { lat: 55.173, lng: -118.795 },
                             stops: [
                                 {
-                                    num: 7,
+                                    num: 10,
                                     tag: "Retail",
                                     title: "Explore Grain Bin Brewing, one of Grande Prairie\u2019s craft staples",
                                     desc: "Grain Bin Brewing Company has been a craft staple in Grande Prairie over the last 10 years. With a focus on quality craft and local ingredients, they have product available in bars and liquor stores around town, as well as their cozy taproom.",
@@ -767,7 +823,7 @@
                                     lng: -118.7815,
                                 },
                                 {
-                                    num: 8,
+                                    num: 11,
                                     tag: "Meal",
                                     title: "Relax with a cocktail at 92 Bev Co.",
                                     desc: "92 Beverage Co is a cocktail bar offering a relaxed vibe in an upscale environment, located in downtown Grande Prairie, AB. It offers the best in Peace Country hospitality with a combination of chill vibes, warm, friendly service, and upscale menu offerings.",
@@ -781,7 +837,7 @@
                                     lng: -118.801,
                                 },
                                 {
-                                    num: 9,
+                                    num: 12,
                                     tag: "Activity",
                                     title: "Take in a show at Grande Prairie Live Theatre",
                                     desc: "For over 60 years, Grande Prairie Live Theatre has been powered by the talents of more than 4,100 volunteers \u2014 actors, singers, dancers, directors, producers, designers, technicians, and behind-the-scenes magicians of every kind. GPLT is a vibrant hub for various plays, concerts, films, and special events.",
@@ -799,6 +855,13 @@
                     ],
                 },
             ];
+
+            // Normalize: ensure every group has an explicit groupType
+            ITINERARY.forEach((d) => {
+                d.items.forEach((item) => {
+                    if (item.type === "group" && !item.groupType) item.groupType = "sequential";
+                });
+            });
 
             // Flatten all stops for map (including stops inside groups, excluding messages)
             const ALL_STOPS = ITINERARY.flatMap((d) =>
@@ -1552,6 +1615,38 @@
                 );
             }
 
+            // ─── Options group icon ─────────────────────────────────────
+            function OptionsIcon({ size = 16, color = ICON_INVERSE }) {
+                return (
+                    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+                        <mask
+                            id="options-mask"
+                            style={{ maskType: "alpha" }}
+                            maskUnits="userSpaceOnUse"
+                            x="0" y="0" width="16" height="16"
+                        >
+                            <g clipPath="url(#options-clip)">
+                                {/* Three horizontal lines with bullet circles */}
+                                <circle cx="3" cy="4" r="1.5" fill="black" />
+                                <path d="M6.5 4H13.5" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                                <circle cx="3" cy="8" r="1.5" fill="black" />
+                                <path d="M6.5 8H13.5" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                                <circle cx="3" cy="12" r="1.5" fill="black" />
+                                <path d="M6.5 12H13.5" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                            </g>
+                        </mask>
+                        <g mask="url(#options-mask)">
+                            <rect width="16" height="16" fill={color} />
+                        </g>
+                        <defs>
+                            <clipPath id="options-clip">
+                                <rect width="16" height="16" fill="white" />
+                            </clipPath>
+                        </defs>
+                    </svg>
+                );
+            }
+
             // ─── Tree icon (from tree.svg) ──────────────────────────────
             function TreeIcon({ size = 20, color = ICON_SUBTLE }) {
                 return (
@@ -2207,6 +2302,112 @@
             // ─── Stop Group card ────────────────────────────────────────
             let GROUP_BG = cssVar("--color-bg-secondary");
 
+            // ─── Compact stop row for "options" groups ─────────────────
+            function OptionStopRow({ stop, accent, onNameClick }) {
+                return (
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: 12,
+                            alignItems: "flex-start",
+                        }}
+                    >
+                        {/* Numbered badge */}
+                        <div
+                            style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 8,
+                                background: accent.bold,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexShrink: 0,
+                                fontFamily: "var(--body-font, 'Outfit'), sans-serif",
+                                fontWeight: 600,
+                                fontSize: 14,
+                                color: BG,
+                                lineHeight: "22px",
+                                fontFeatureSettings: "'lnum' 1, 'tnum' 1",
+                                transition: "background .2s ease",
+                            }}
+                        >
+                            {stop.num}
+                        </div>
+                        {/* Thumbnail */}
+                        <img
+                            src={stop.img}
+                            alt=""
+                            style={{
+                                width: 100,
+                                height: 100,
+                                borderRadius: 8,
+                                objectFit: "cover",
+                                flexShrink: 0,
+                            }}
+                        />
+                        {/* Details */}
+                        <div
+                            style={{
+                                flex: 1,
+                                minWidth: 0,
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 4,
+                            }}
+                        >
+                            <span
+                                onClick={onNameClick ? () => onNameClick(stop) : undefined}
+                                style={{
+                                    fontFamily: "var(--body-font, 'Outfit'), sans-serif",
+                                    fontWeight: 600,
+                                    fontSize: 14,
+                                    color: LINK,
+                                    lineHeight: "22px",
+                                    fontFeatureSettings: "'lnum' 1, 'tnum' 1",
+                                    cursor: onNameClick ? "pointer" : "default",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: 4,
+                                }}
+                            >
+                                {stop.biz}
+                                <AnimatedArrow visible={!!onNameClick} color={LINK} />
+                            </span>
+                            <span
+                                style={{
+                                    fontFamily: "var(--body-font, 'Outfit'), sans-serif",
+                                    fontWeight: 500,
+                                    fontSize: 14,
+                                    color: SUBTLEST,
+                                    lineHeight: "22px",
+                                    fontFeatureSettings: "'lnum' 1, 'tnum' 1",
+                                }}
+                            >
+                                {stop.address}
+                            </span>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 2,
+                                    fontFamily: "var(--body-font, 'Outfit'), sans-serif",
+                                    fontWeight: 400,
+                                    fontSize: 14,
+                                    color: PRIMARY,
+                                    lineHeight: "22px",
+                                    textDecoration: "underline",
+                                    fontFeatureSettings: "'lnum' 1, 'tnum' 1",
+                                }}
+                            >
+                                {stop.phone && <span>{stop.phone}</span>}
+                                <span>Google Maps</span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
             function StopGroupCard({
                 group,
                 isActive,
@@ -2254,7 +2455,9 @@
                                         flexShrink: 0,
                                     }}
                                 >
-                                    <ExploreIcon size={16} color={ICON_INVERSE} />
+                                    {group.groupType === "options"
+                                        ? <OptionsIcon size={16} color={ICON_INVERSE} />
+                                        : <ExploreIcon size={16} color={ICON_INVERSE} />}
                                 </div>
                                 <Tag text={group.tag} accent={accent} />
                             </div>
@@ -2296,7 +2499,7 @@
                             </div>
                         )}
 
-                        {/* Grouped stops — use standard StopCard layout */}
+                        {/* Grouped stops */}
                         <div
                             style={{
                                 display: "flex",
@@ -2310,15 +2513,23 @@
                                     <div
                                         ref={(el) => stopRefCallback && stopRefCallback(s.num, el)}
                                     >
-                                        <StopCard
-                                            stop={s}
-                                            isLast={si === group.stops.length - 1}
-                                            isActive={isActive && s.num === activeStopNum}
-                                            accent={accent}
-                                            onNameClick={onStopNameClick}
-                                        />
+                                        {group.groupType === "options" ? (
+                                            <OptionStopRow
+                                                stop={s}
+                                                accent={accent}
+                                                onNameClick={onStopNameClick}
+                                            />
+                                        ) : (
+                                            <StopCard
+                                                stop={s}
+                                                isLast={si === group.stops.length - 1}
+                                                isActive={isActive && s.num === activeStopNum}
+                                                accent={accent}
+                                                onNameClick={onStopNameClick}
+                                            />
+                                        )}
                                     </div>
-                                    {si < group.stops.length - 1 && (
+                                    {si < group.stops.length - 1 && group.groupType !== "options" && (
                                         <DrivingSep from={s} to={group.stops[si + 1]} />
                                     )}
                                 </React.Fragment>
@@ -2346,22 +2557,26 @@
                                     flexShrink: 0,
                                 }}
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path
-                                        d="M7 12.5L10 15.5L17 8.5"
-                                        stroke={SUBTLE}
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                    <path
-                                        d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                                        stroke={SUBTLE}
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
+                                {group.groupType === "options" ? (
+                                    <OptionsIcon size={20} color={SUBTLE} />
+                                ) : (
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M7 12.5L10 15.5L17 8.5"
+                                            stroke={SUBTLE}
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                        <path
+                                            d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                            stroke={SUBTLE}
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                )}
                             </div>
                             <span
                                 style={{
@@ -2852,9 +3067,8 @@
                                 source: "group-boundary",
                                 paint: {
                                     "line-color": accentRef.current,
-                                    "line-width": 2.5,
+                                    "line-width": 3,
                                     "line-opacity": 0.5,
-                                    "line-dasharray": [4, 3],
                                 },
                             },
                             "stops-layer",
@@ -2936,7 +3150,10 @@
                         const features = ALL_STOPS.map((s) => {
                             let state = "default";
                             if (pillVisible) {
-                                if (s.num === activeStopNum) {
+                                if (activeGroup && activeGroup.groupType === "options" && groupStopNums.includes(s.num)) {
+                                    // Options group: all stops are equally "active"
+                                    state = "active";
+                                } else if (s.num === activeStopNum) {
                                     // The currently focused stop is always "active"
                                     state = "active";
                                 } else if (activeGroup && groupStopNums.includes(s.num)) {
@@ -2963,7 +3180,7 @@
                     // Update boundary polygon
                     const boundarySrc = map.getSource("group-boundary");
                     if (boundarySrc) {
-                        if (activeGroup && pillVisible) {
+                        if (activeGroup && pillVisible && activeGroup.groupType !== "options") {
                             boundarySrc.setData({
                                 type: "FeatureCollection",
                                 features: [
@@ -3036,7 +3253,9 @@
                             if (activeGroup && groupChanged) {
                                 // Just entered a group — zoom out to fit the boundary first
                                 const bounds = new mapboxgl.LngLatBounds();
-                                activeGroup.boundary.forEach((coord) => bounds.extend(coord));
+                                if (activeGroup.groupType !== "options") {
+                                    activeGroup.boundary.forEach((coord) => bounds.extend(coord));
+                                }
                                 activeGroup.stops.forEach((s) => bounds.extend([s.lng, s.lat]));
                                 map.fitBounds(bounds, {
                                     padding: mobilePad
@@ -3052,6 +3271,8 @@
                                     bearing: 5,
                                     maxZoom: 15,
                                 });
+                            } else if (activeGroup && activeGroup.groupType === "options") {
+                                // Options group: camera stays put, no per-stop panning
                             } else if (activeStopObj) {
                                 // Fly to individual stop (whether inside group or standalone)
                                 let dist = 0;
