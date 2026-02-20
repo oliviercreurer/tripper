@@ -2574,11 +2574,11 @@
                                             fontFeatureSettings: "'lnum' 1, 'tnum' 1",
                                         }}
                                     >
-                                        <span>2 days</span>
+                                        <span>{ITINERARY.length} {ITINERARY.length === 1 ? "day" : "days"}</span>
                                         <span style={{ color: BORDER }}>|</span>
-                                        <span>237 km</span>
+                                        <span>{Math.round(ITINERARY.reduce((sum, d) => sum + parseFloat(d.distance), 0))} km</span>
                                         <span style={{ color: BORDER }}>|</span>
-                                        <span>9 stops</span>
+                                        <span>{ALL_STOPS.length} {ALL_STOPS.length === 1 ? "stop" : "stops"}</span>
                                     </div>
                                 </div>
                             </div>
