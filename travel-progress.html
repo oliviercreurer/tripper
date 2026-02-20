@@ -277,14 +277,10 @@
             };
         </script>
         <script>
-            // Theme init — runs before React to avoid flash of wrong theme
+            // Theme init — light mode enforced for now
+            // Dark mode infrastructure is retained but disabled
             (function () {
-                var saved = null;
-                try { saved = localStorage.getItem("theme"); } catch (e) {}
-                var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-                if (saved === "dark" || (!saved && prefersDark)) {
-                    document.documentElement.classList.add("dark");
-                }
+                document.documentElement.classList.remove("dark");
             })();
         </script>
         <script type="text/babel" data-type="module">
@@ -4213,23 +4209,8 @@
                 const [mobileView, setMobileView] = useState("itinerary"); // "itinerary" | "map"
                 const [openInfoStop, setOpenInfoStop] = useState(null);
                 const [lightboxSrc, setLightboxSrc] = useState(null);
-                const [isDark, setIsDark] = useState(
-                    document.documentElement.classList.contains("dark"),
-                );
-                const accent = useMemo(() => deriveAccent(accentHex), [accentHex, isDark]);
-
-                // Handle theme toggle
-                const handleThemeChange = useCallback(function (dark) {
-                    if (dark) {
-                        document.documentElement.classList.add("dark");
-                    } else {
-                        document.documentElement.classList.remove("dark");
-                    }
-                    try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
-                    // Re-read all CSS-variable-derived module-level constants
-                    refreshThemeVars();
-                    setIsDark(dark);
-                }, []);
+                const isDark = false; // Dark mode disabled — infrastructure retained
+                const accent = useMemo(() => deriveAccent(accentHex), [accentHex]);
 
                 // Sync font CSS variable to document root
                 useEffect(
@@ -4849,7 +4830,6 @@
                                 >
                                     <AccentPicker accentHex={accentHex} onChange={setAccentHex} isDark={isDark} />
                                     <FontPicker fontIndex={fontIndex} onChange={setFontIndex} />
-                                    <ThemePicker isDark={isDark} onChange={handleThemeChange} />
                                 </div>
                                 {itineraryContent}
 
