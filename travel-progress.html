@@ -13,6 +13,154 @@
         <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
         <script src="https://fast.wistia.com/player.js" async></script>
         <style>
+            /* ─── Design tokens (light mode) ─────────────────────── */
+            :root {
+                /* Background */
+                --color-bg-primary: #FFFDF6;
+                --color-bg-secondary: #F7F6ED;
+                --color-bg-inverted: #100F0F;
+                --color-bg-inverted-hovered: #282726;
+                --color-bg-neutral-subtler: #E6E4D9;
+                --color-bg-neutral-bold: #6F6E69;
+                --color-bg-disabled: #E6E4D9;
+
+                /* Background — accent */
+                --color-bg-accent-orange-subtlest: #FFE7CE;
+                --color-bg-accent-orange-subtler: #FED3AF;
+                --color-bg-accent-orange-subtle: #F9AE77;
+                --color-bg-accent-orange-bolder: #BC5215;
+                --color-bg-accent-yellow-subtlest: #FAEEC6;
+                --color-bg-accent-yellow-subtler: #F6E2A0;
+                --color-bg-accent-yellow-subtle: #ECCB60;
+                --color-bg-accent-yellow-bolder: #AD8301;
+                --color-bg-accent-green-subtlest: #EDEECF;
+                --color-bg-accent-green-subtler: #DDE2B2;
+                --color-bg-accent-green-subtle: #BEC97E;
+                --color-bg-accent-green-bolder: #66800B;
+                --color-bg-accent-blue-subtlest: #E1ECEB;
+                --color-bg-accent-blue-subtler: #C6DDE8;
+                --color-bg-accent-blue-subtle: #92BFDB;
+                --color-bg-accent-blue-bolder: #205EA6;
+                --color-bg-accent-purple-subtlest: #F0EAEC;
+                --color-bg-accent-purple-subtler: #E2D9E9;
+                --color-bg-accent-purple-subtle: #C4B9E0;
+                --color-bg-accent-purple-bolder: #5E409D;
+
+                /* Background — success */
+                --color-bg-success-bold: #66800B;
+                --color-bg-success-bold-hovered: #536907;
+
+                /* Text */
+                --color-text-default: #100F0F;
+                --color-text-subtle: #6F6E69;
+                --color-text-subtlest: #B7B5AC;
+                --color-text-disabled: #B7B5AC;
+                --color-text-inverse: #FFFDF6;
+
+                /* Icon */
+                --color-icon-normal: #100F0F;
+                --color-icon-subtle: #6F6E69;
+                --color-icon-subtlest: #B7B5AC;
+                --color-icon-inverse: #FFFDF6;
+
+                /* Border */
+                --color-border-default: #DAD8CE;
+                --color-border-bold: #B7B5AC;
+                --color-border-boldest: #100F0F;
+                --color-border-inverse: #FFFDF6;
+
+                /* Link */
+                --color-link-default: #24837B;
+
+                /* Elevation / surfaces */
+                --color-elevation-surface: #FFFFFF;
+
+                /* Opacity overlays (light) */
+                --color-overlay-scrim: rgba(255, 253, 246, 0.7);
+                --color-overlay-blur-bg: rgba(255, 253, 246, 0.55);
+
+                /* Shadows */
+                --shadow-overlay: 0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);
+                --shadow-card: 0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);
+                --shadow-badge: 0 0 4px 0 rgba(0, 0, 0, 0.40);
+                --shadow-toggle-knob: 0 1px 3px rgba(0,0,0,.15);
+            }
+
+            /* ─── Design tokens (dark mode) ──────────────────────── */
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    /* Background */
+                    --color-bg-primary: #100F0F;
+                    --color-bg-secondary: #1C1B1A;
+                    --color-bg-inverted: #FFFDF6;
+                    --color-bg-inverted-hovered: #F7F6ED;
+                    --color-bg-neutral-subtler: #282726;
+                    --color-bg-neutral-bold: #B7B5AC;
+                    --color-bg-disabled: #343331;
+
+                    /* Background — accent */
+                    --color-bg-accent-orange-subtlest: #27180E;
+                    --color-bg-accent-orange-subtler: #40200D;
+                    --color-bg-accent-orange-subtle: #71320D;
+                    --color-bg-accent-orange-bolder: #EC8B49;
+                    --color-bg-accent-yellow-subtlest: #241E08;
+                    --color-bg-accent-yellow-subtler: #3A2D04;
+                    --color-bg-accent-yellow-subtle: #664D01;
+                    --color-bg-accent-yellow-bolder: #DFB431;
+                    --color-bg-accent-green-subtlest: #1A1E0C;
+                    --color-bg-accent-green-subtler: #252D09;
+                    --color-bg-accent-green-subtle: #3D4C07;
+                    --color-bg-accent-green-bolder: #A0AF54;
+                    --color-bg-accent-blue-subtlest: #101A24;
+                    --color-bg-accent-blue-subtler: #12253B;
+                    --color-bg-accent-blue-subtle: #163B66;
+                    --color-bg-accent-blue-bolder: #66A0C8;
+                    --color-bg-accent-purple-subtlest: #1A1623;
+                    --color-bg-accent-purple-subtler: #261C39;
+                    --color-bg-accent-purple-subtle: #3C2A62;
+                    --color-bg-accent-purple-bolder: #A699D0;
+
+                    /* Background — success */
+                    --color-bg-success-bold: #A0AF54;
+                    --color-bg-success-bold-hovered: #BEC97E;
+
+                    /* Text */
+                    --color-text-default: #CECDC3;
+                    --color-text-subtle: #878580;
+                    --color-text-subtlest: #575653;
+                    --color-text-disabled: #575653;
+                    --color-text-inverse: #100F0F;
+
+                    /* Icon */
+                    --color-icon-normal: #CECDC3;
+                    --color-icon-subtle: #878580;
+                    --color-icon-subtlest: #575653;
+                    --color-icon-inverse: #100F0F;
+
+                    /* Border */
+                    --color-border-default: #343331;
+                    --color-border-bold: #6F6E69;
+                    --color-border-boldest: #CECDC3;
+                    --color-border-inverse: #100F0F;
+
+                    /* Link */
+                    --color-link-default: #3AA99F;
+
+                    /* Elevation / surfaces */
+                    --color-elevation-surface: #1C1B1A;
+
+                    /* Opacity overlays (dark) */
+                    --color-overlay-scrim: rgba(16, 15, 15, 0.7);
+                    --color-overlay-blur-bg: rgba(16, 15, 15, 0.55);
+
+                    /* Shadows (softer in dark mode) */
+                    --shadow-overlay: 0 2px 12px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.06);
+                    --shadow-card: 0 2px 12px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.06);
+                    --shadow-badge: 0 0 4px 0 rgba(0, 0, 0, 0.60);
+                    --shadow-toggle-knob: 0 1px 3px rgba(0,0,0,.3);
+                }
+            }
+
             *,
             *::before,
             *::after {
@@ -28,7 +176,7 @@
                 overflow: hidden;
             }
             body {
-                background: #fffdf6;
+                background: var(--color-bg-primary);
                 -webkit-font-smoothing: antialiased;
             }
             ::-webkit-scrollbar {
@@ -53,7 +201,7 @@
                 font-family: "Outfit", sans-serif;
                 font-weight: 600;
                 font-size: 14px;
-                color: #fffdf6;
+                color: var(--color-text-inverse);
                 line-height: 22px;
                 transition:
                     scale 0.3s ease,
@@ -63,23 +211,23 @@
                 cursor: pointer;
             }
             .stop-marker.inactive {
-                background: #66800b;
+                background: var(--color-bg-success-bold);
                 scale: 1;
-                box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.4);
+                box-shadow: var(--shadow-badge);
             }
             .stop-marker.inactive.tracking {
-                background: #b7b5ac;
+                background: var(--color-text-subtlest);
                 scale: 0.85;
                 box-shadow: none;
             }
             .stop-marker.active {
-                background: #66800b;
+                background: var(--color-bg-success-bold);
                 scale: 1.15;
                 box-shadow: 0 4px 12px rgba(102, 128, 11, 0.4);
-                border-color: #fffdf6;
+                border-color: var(--color-border-inverse);
             }
             .stop-marker.visited {
-                background: #536907;
+                background: var(--color-bg-success-bold-hovered);
                 scale: 0.95;
             }
             .mapboxgl-popup-content {
@@ -131,24 +279,40 @@
         <script type="text/babel" data-type="module">
             const { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } = React;
 
-            // ─── Design tokens ──────────────────────────────────────────
-            const BG = "#fffdf6";
-            const BORDER = "#DAD8CE";
-            const SUBTLE = "#6f6e69";
-            const PRIMARY = "#1c1b1a";
+            // ─── Design tokens (resolved from CSS custom properties) ────
+            // These read the computed CSS variable values so they stay in sync
+            // with light/dark mode. They are evaluated once at boot; components
+            // that need reactive theme switching should read getComputedStyle
+            // or use the CSS variables directly in inline styles.
+            function cssVar(name) {
+                return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+            }
+            const BG = cssVar("--color-bg-primary");
+            const BORDER = cssVar("--color-border-default");
+            const SUBTLE = cssVar("--color-text-subtle");
+            const PRIMARY = cssVar("--color-text-default");
+            const ICON_NORMAL = cssVar("--color-icon-normal");
+            const ICON_SUBTLE = cssVar("--color-icon-subtle");
+            const ICON_INVERSE = cssVar("--color-icon-inverse");
 
             // Gradient segment colors: track (stroke/ring) and bg (dot fill)
+            // Maps to accent/[color]/subtle and accent/[color]/subtlest tokens
+            // Kept as RGB arrays for the lerpColors interpolation function
+            function hexToRgbArray(hex) {
+                const h = hex.replace("#", "");
+                return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+            }
             const TRACK_RGB = [
-                [249, 174, 119], // #F9AE77  orange
-                [236, 203, 96], // #ECCB60  yellow
-                [146, 191, 219], // #92BFDB  blue
-                [196, 185, 224], // #C4B9E0  purple
+                hexToRgbArray(cssVar("--color-bg-accent-orange-subtle")),  // orange
+                hexToRgbArray(cssVar("--color-bg-accent-yellow-subtle")),  // yellow
+                hexToRgbArray(cssVar("--color-bg-accent-blue-subtle")),    // blue
+                hexToRgbArray(cssVar("--color-bg-accent-purple-subtle")),  // purple
             ];
             const BG_RGB = [
-                [255, 231, 206], // #FFE7CE
-                [250, 238, 198], // #FAEEC6
-                [225, 236, 235], // #E1ECEB
-                [240, 234, 236], // #F0EAEC
+                hexToRgbArray(cssVar("--color-bg-accent-orange-subtlest")),  // orange bg
+                hexToRgbArray(cssVar("--color-bg-accent-yellow-subtlest")),  // yellow bg
+                hexToRgbArray(cssVar("--color-bg-accent-blue-subtlest")),    // blue bg
+                hexToRgbArray(cssVar("--color-bg-accent-purple-subtlest")),  // purple bg
             ];
 
             // Day section accent colors (for the scroll content below)
@@ -308,9 +472,9 @@
                 return { bold, text, bg, border };
             }
 
-            const DEFAULT_ACCENT = "#66800b";
-            const LINK = "#24837b";
-            const SUBTLEST = "#b7b5ac";
+            const DEFAULT_ACCENT = cssVar("--color-bg-success-bold");
+            const LINK = cssVar("--color-link-default");
+            const SUBTLEST = cssVar("--color-text-subtlest");
 
             // ─── Font options ─────────────────────────────────────────
             const FONT_OPTIONS = [
@@ -588,8 +752,8 @@
             );
 
             // ─── Progress Pill ──────────────────────────────────────────
-            const COMPLETE_TRACK = "#BEC97E";
-            const COMPLETE_BG = "#EDEECF";
+            const COMPLETE_TRACK = cssVar("--color-bg-accent-green-subtle") || "#BEC97E";
+            const COMPLETE_BG = cssVar("--color-bg-accent-green-subtlest") || "#EDEECF";
 
             function ProgressPill({
                 dayNumber,
@@ -779,7 +943,7 @@
                     };
                 }, [ready]);
 
-                const labelColor = "#100F0F";
+                const labelColor = PRIMARY;
 
                 const [textPhase, setTextPhase] = useState("idle");
                 const [displayDay, setDisplayDay] = useState(dayNumber);
@@ -1111,7 +1275,7 @@
                                         width: 2,
                                         flex: 1,
                                         background:
-                                            "linear-gradient(180deg, #DAD8CE 0%, rgba(218, 216, 206, 0.00) 86.26%)",
+                                            `linear-gradient(180deg, ${BORDER} 0%, rgba(218, 216, 206, 0.00) 86.26%)`,
                                         borderRadius: 1,
                                     }}
                                 />
@@ -1132,7 +1296,7 @@
                                             fontWeight: 600,
                                             fontSize: 18,
                                             lineHeight: "24px",
-                                            color: "#100f0f",
+                                            color: PRIMARY,
                                             margin: 0,
                                             fontFeatureSettings: "'lnum' 1, 'tnum' 1",
                                         }}
@@ -1219,7 +1383,7 @@
                                                     "var(--body-font, 'Outfit'), sans-serif",
                                                 fontWeight: 400,
                                                 fontSize: 14,
-                                                color: "#100f0f",
+                                                color: PRIMARY,
                                                 lineHeight: "22px",
                                                 textDecoration: "underline",
                                                 fontFeatureSettings: "'lnum' 1, 'tnum' 1",
@@ -1237,7 +1401,7 @@
             }
 
             // ─── Explore icon (from explore.svg — starburst/compass) ────
-            function ExploreIcon({ size = 16, color = "#fffdf6" }) {
+            function ExploreIcon({ size = 16, color = ICON_INVERSE }) {
                 return (
                     <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
                         <mask
@@ -1321,7 +1485,7 @@
             }
 
             // ─── Tree icon (from tree.svg) ──────────────────────────────
-            function TreeIcon({ size = 20, color = "#6F6E69" }) {
+            function TreeIcon({ size = 20, color = ICON_SUBTLE }) {
                 return (
                     <svg width={size} height={size} viewBox="0 0 20 20" fill="none">
                         <mask
@@ -1377,7 +1541,7 @@
             }
 
             // ─── IM icon: Warning (diamond alert) ──────────────────────────
-            function WarningIcon({ size = 20, color = "#100f0f" }) {
+            function WarningIcon({ size = 20, color = ICON_NORMAL }) {
                 return (
                     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
                         <mask
@@ -1431,7 +1595,7 @@
             }
 
             // ─── IM icon: Welcome To (map pin) ───────────────────────────
-            function WelcomeToIcon({ size = 20, color = "#100f0f" }) {
+            function WelcomeToIcon({ size = 20, color = ICON_NORMAL }) {
                 return (
                     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
                         <mask
@@ -1472,7 +1636,7 @@
             }
 
             // ─── IM icon: Attention (eye) ────────────────────────────────
-            function AttentionIcon({ size = 20, color = "#100f0f" }) {
+            function AttentionIcon({ size = 20, color = ICON_NORMAL }) {
                 return (
                     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
                         <mask
@@ -1514,7 +1678,7 @@
             }
 
             // ─── IM icon: FYI (info circle) ──────────────────────────────
-            function FyiIcon({ size = 20, color = "#100f0f" }) {
+            function FyiIcon({ size = 20, color = ICON_NORMAL }) {
                 return (
                     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
                         <mask
@@ -1563,7 +1727,7 @@
             }
 
             // ─── IM icon: Scenery (tree — reuses existing paths at 24px) ─
-            function SceneryIcon({ size = 20, color = "#100f0f" }) {
+            function SceneryIcon({ size = 20, color = ICON_NORMAL }) {
                 return (
                     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
                         <mask
@@ -1619,7 +1783,7 @@
             }
 
             // ─── IM icon: Custom (chat bubble) ───────────────────────────
-            function CustomIMIcon({ size = 20, color = "#100f0f" }) {
+            function CustomIMIcon({ size = 20, color = ICON_NORMAL }) {
                 return (
                     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
                         <mask
@@ -1669,27 +1833,27 @@
             const IM_TYPES = {
                 scenery: {
                     label: "Scenery",
-                    badgeBg: "#dde2b2",
-                    iconColor: "#66800B",
+                    badgeBg: cssVar("--color-bg-accent-green-subtler"),     // background/accent/green/subtler
+                    iconColor: cssVar("--color-bg-accent-green-bolder"),    // icon/success (green-600)
                     Icon: SceneryIcon,
                 },
                 attention: {
                     label: "Attention",
-                    badgeBg: "#f6e2a0",
-                    iconColor: "#AD8301",
+                    badgeBg: cssVar("--color-bg-accent-yellow-subtler"),    // background/accent/yellow/subtler
+                    iconColor: cssVar("--color-bg-accent-yellow-bolder"),   // icon/warning (yellow-600)
                     Icon: AttentionIcon,
                 },
-                fyi: { label: "FYI", badgeBg: "#c6dde8", iconColor: "#205EA6", Icon: FyiIcon },
+                fyi: { label: "FYI", badgeBg: cssVar("--color-bg-accent-blue-subtler"), iconColor: cssVar("--color-bg-accent-blue-bolder"), Icon: FyiIcon },
                 warning: {
                     label: "Warning",
-                    badgeBg: "#fed3af",
-                    iconColor: "#BC5215",
+                    badgeBg: cssVar("--color-bg-accent-orange-subtler"),    // background/accent/orange/subtler
+                    iconColor: cssVar("--color-bg-accent-orange-bolder"),   // icon/accent/orange (orange-600)
                     Icon: WarningIcon,
                 },
                 welcome_to: {
                     label: "Welcome to",
-                    badgeBg: "#e2d9e9",
-                    iconColor: "#5E409D",
+                    badgeBg: cssVar("--color-bg-accent-purple-subtler"),    // background/accent/purple/subtler
+                    iconColor: cssVar("--color-bg-accent-purple-bolder"),   // icon/discovery (purple-600)
                     Icon: WelcomeToIcon,
                 },
                 custom: { label: null, badgeBg: null, iconColor: null, Icon: CustomIMIcon },
@@ -1745,8 +1909,8 @@
                 const imType = IM_TYPES[mt] || IM_TYPES.scenery;
                 const Icon = imType.Icon;
                 const isCustom = mt === "custom";
-                const badgeBg = isCustom ? (accent ? accent.bg : "#E6E4D9") : imType.badgeBg;
-                const iconColor = isCustom ? (accent ? accent.bold : "#100f0f") : imType.iconColor;
+                const badgeBg = isCustom ? (accent ? accent.bg : cssVar("--color-bg-neutral-subtler")) : imType.badgeBg;
+                const iconColor = isCustom ? (accent ? accent.bold : PRIMARY) : imType.iconColor;
                 const label = isCustom ? message.label || message.title : imType.label;
 
                 return (
@@ -1782,7 +1946,7 @@
                                     fontFamily: "var(--body-font, 'Outfit'), sans-serif",
                                     fontWeight: 600,
                                     fontSize: 16,
-                                    color: "#100f0f",
+                                    color: PRIMARY,
                                     lineHeight: "24px",
                                     fontFeatureSettings: "'lnum' 1, 'tnum' 1",
                                 }}
@@ -1810,7 +1974,7 @@
             // ─── Wistia video embed ─────────────────────────────────────
             function WistiaEmbed({ mediaId, accentHex }) {
                 const containerRef = useRef(null);
-                const playerColor = (accentHex || "#66800b").replace("#", "");
+                const playerColor = (accentHex || DEFAULT_ACCENT).replace("#", "");
 
                 useEffect(() => {
                     if (!containerRef.current) return;
@@ -1970,7 +2134,7 @@
             }
 
             // ─── Stop Group card ────────────────────────────────────────
-            const GROUP_BG = "#f7f6ed"; // slightly darker — exempt from accent changes
+            const GROUP_BG = cssVar("--color-bg-secondary");
 
             function StopGroupCard({
                 group,
@@ -2012,14 +2176,14 @@
                                         width: 32,
                                         height: 32,
                                         borderRadius: 8,
-                                        background: "#100f0f",
+                                        background: PRIMARY,
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
                                         flexShrink: 0,
                                     }}
                                 >
-                                    <ExploreIcon size={16} color="#fffdf6" />
+                                    <ExploreIcon size={16} color={ICON_INVERSE} />
                                 </div>
                                 <Tag text={group.tag} accent={accent} />
                             </div>
@@ -2028,7 +2192,7 @@
                                     fontFamily: "var(--body-font, 'Outfit'), sans-serif",
                                     fontWeight: 600,
                                     fontSize: 32,
-                                    color: "#100f0f",
+                                    color: PRIMARY,
                                     lineHeight: "38px",
                                     margin: 0,
                                     letterSpacing: "-0.5px",
@@ -2104,7 +2268,7 @@
                                     width: 32,
                                     height: 32,
                                     borderRadius: 8,
-                                    background: "#E6E4D9",
+                                    background: cssVar("--color-bg-neutral-subtler"),
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
@@ -2224,28 +2388,28 @@
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path
                                     d="M8 10L16 10"
-                                    stroke="#6F6E69"
+                                    stroke={ICON_SUBTLE}
                                     strokeWidth="2"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                 />
                                 <path
                                     d="M7 14L8 14"
-                                    stroke="#6F6E69"
+                                    stroke={ICON_SUBTLE}
                                     strokeWidth="2"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                 />
                                 <path
                                     d="M16 14L17 14"
-                                    stroke="#6F6E69"
+                                    stroke={ICON_SUBTLE}
                                     strokeWidth="2"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                 />
                                 <path
                                     d="M3 18V11.4105C3 11.1397 3.05502 10.8716 3.16171 10.6227L5.4805 5.21216C5.79566 4.47679 6.51874 4 7.31879 4H16.6812C17.4813 4 18.2043 4.47679 18.5195 5.21216L20.8383 10.6227C20.945 10.8716 21 11.1397 21 11.4105V18M3 18V20.4C3 20.7314 3.26863 21 3.6 21H6.4C6.73137 21 7 20.7314 7 20.4V18M3 18H7M21 18V20.4C21 20.7314 20.7314 21 20.4 21H17.6C17.2686 21 17 20.7314 17 20.4V18M21 18H17M7 18H17"
-                                    stroke="#6F6E69"
+                                    stroke={ICON_SUBTLE}
                                     strokeWidth="2"
                                 />
                             </svg>
@@ -2309,7 +2473,7 @@
                                         fontFamily: "var(--body-font, 'Outfit'), sans-serif",
                                         fontWeight: 600,
                                         fontSize: 36,
-                                        color: "#100f0f",
+                                        color: PRIMARY,
                                         lineHeight: "44px",
                                         letterSpacing: "-0.5px",
                                         margin: 0,
@@ -2443,7 +2607,7 @@
                 }
 
                 // Number text
-                ctx.fillStyle = "#fffdf6";
+                ctx.fillStyle = cssVar("--color-text-inverse");
                 ctx.font = `600 ${14 * dpr}px Outfit, sans-serif`;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
@@ -2502,8 +2666,8 @@
                         function registerBadges(accent) {
                             const states = [
                                 { suffix: "default", bg: accent, border: null },
-                                { suffix: "inactive", bg: "#b7b5ac", border: null },
-                                { suffix: "active", bg: accent, border: "#fffdf6" },
+                                { suffix: "inactive", bg: cssVar("--color-text-subtlest"), border: null },
+                                { suffix: "active", bg: accent, border: cssVar("--color-border-inverse") },
                             ];
                             ALL_STOPS.forEach((stop) => {
                                 states.forEach(({ suffix, bg, border }) => {
@@ -2555,7 +2719,7 @@
                                 type: "line",
                                 source: `route-day-${di}`,
                                 paint: {
-                                    "line-color": DAY_COLORS[di] || "#888",
+                                    "line-color": DAY_COLORS[di] || SUBTLE,
                                     "line-width": 3,
                                     "line-opacity": 0.5,
                                     "line-dasharray": [3, 2],
@@ -2909,10 +3073,10 @@
                             display: "flex",
                             alignItems: "center",
                             gap: 10,
-                            background: "#fff",
+                            background: cssVar("--color-elevation-surface"),
                             borderRadius: 999,
                             padding: "8px 16px 8px 10px",
-                            boxShadow: "0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06)",
+                            boxShadow: cssVar("--shadow-overlay"),
                             cursor: "pointer",
                             transition: "box-shadow .2s ease",
                             userSelect: "none",
@@ -2924,7 +3088,7 @@
                                 width: 40,
                                 height: 24,
                                 borderRadius: 12,
-                                background: enabled ? accent.bold : "#b7b5ac",
+                                background: enabled ? accent.bold : SUBTLEST,
                                 position: "relative",
                                 transition: "background .3s ease",
                                 flexShrink: 0,
@@ -2936,7 +3100,7 @@
                                     width: 20,
                                     height: 20,
                                     borderRadius: "50%",
-                                    background: "#fff",
+                                    background: cssVar("--color-elevation-surface"),
                                     position: "absolute",
                                     top: 2,
                                     left: enabled ? 18 : 2,
@@ -3125,11 +3289,11 @@
                                     height: 32,
                                     padding: "0 12px",
                                     borderRadius: 8,
-                                    background: "rgba(255,253,246,0.55)",
+                                    background: cssVar("--color-overlay-blur-bg"),
                                     backdropFilter: "blur(12px)",
                                     WebkitBackdropFilter: "blur(12px)",
                                     boxShadow:
-                                        "0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06)",
+                                        cssVar("--shadow-overlay"),
                                     cursor: "pointer",
                                     fontFamily: "var(--body-font, 'Outfit'), sans-serif",
                                     fontWeight: 500,
@@ -3167,11 +3331,11 @@
                                         height: 32,
                                         padding: "0 12px",
                                         borderRadius: 8,
-                                        background: "rgba(255,253,246,0.55)",
+                                        background: cssVar("--color-overlay-blur-bg"),
                                         backdropFilter: "blur(12px)",
                                         WebkitBackdropFilter: "blur(12px)",
                                         boxShadow:
-                                            "0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06)",
+                                            cssVar("--shadow-overlay"),
                                         cursor: "pointer",
                                         fontFamily: "var(--body-font, 'Outfit'), sans-serif",
                                         fontWeight: 500,
@@ -3383,7 +3547,7 @@
                             borderRadius: 16,
                             padding: 20,
                             border: `2px solid ${isActive ? accent.bold : BORDER}`,
-                            boxShadow: "0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06)",
+                            boxShadow: cssVar("--shadow-overlay"),
                             display: "flex",
                             flexDirection: "column",
                             gap: 12,
@@ -3399,7 +3563,7 @@
                                     fontFamily: "var(--body-font, 'Outfit'), sans-serif",
                                     fontWeight: 600,
                                     fontSize: 14,
-                                    color: "#100f0f",
+                                    color: PRIMARY,
                                     lineHeight: "22px",
                                     margin: 0,
                                     fontFeatureSettings: "'lnum' 1, 'tnum' 1",
@@ -3621,7 +3785,7 @@
                                         fontFamily: "var(--body-font, 'Outfit'), sans-serif",
                                         fontWeight: 600,
                                         fontSize: 14,
-                                        color: "#100f0f",
+                                        color: PRIMARY,
                                         lineHeight: "20px",
                                         fontFeatureSettings: "'lnum' 1, 'tnum' 1",
                                     }}
@@ -3684,10 +3848,10 @@
                             display: "flex",
                             alignItems: "center",
                             gap: 10,
-                            background: "#fff",
+                            background: cssVar("--color-elevation-surface"),
                             borderRadius: 999,
                             padding: "8px 16px 8px 10px",
-                            boxShadow: "0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06)",
+                            boxShadow: cssVar("--shadow-overlay"),
                             cursor: "pointer",
                             transition: "box-shadow .2s ease",
                         }}
@@ -3743,10 +3907,10 @@
                             display: "flex",
                             alignItems: "center",
                             gap: 10,
-                            background: "#fff",
+                            background: cssVar("--color-elevation-surface"),
                             borderRadius: 999,
                             padding: "8px 16px",
-                            boxShadow: "0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06)",
+                            boxShadow: cssVar("--shadow-overlay"),
                             cursor: "pointer",
                             transition: "box-shadow .2s ease",
                             userSelect: "none",
@@ -3835,7 +3999,7 @@
                             style={{
                                 position: "absolute",
                                 inset: 0,
-                                background: "rgba(255,253,246,0.7)",
+                                background: cssVar("--color-overlay-scrim"),
                                 opacity: isOpen ? 1 : 0,
                                 transition:
                                     "opacity " + LIGHTBOX_DIM_MS + "ms " + EASE.standard.expressive,
@@ -4165,7 +4329,7 @@
                                                     "var(--body-font, 'Outfit'), sans-serif",
                                                 fontSize: 24,
                                                 fontWeight: 600,
-                                                color: "#100f0f",
+                                                color: PRIMARY,
                                                 lineHeight: "32px",
                                                 margin: 0,
                                             }}
@@ -4447,7 +4611,7 @@
                                         position: "absolute",
                                         inset: 0,
                                         zIndex: 49,
-                                        background: "rgba(255,253,246,0.7)",
+                                        background: cssVar("--color-overlay-scrim"),
                                         opacity: openInfoStop ? 1 : 0,
                                         pointerEvents: openInfoStop ? "auto" : "none",
                                         transition:
@@ -4546,7 +4710,7 @@
                                         position: "absolute",
                                         inset: 0,
                                         zIndex: 49,
-                                        background: "rgba(255,253,246,0.7)",
+                                        background: cssVar("--color-overlay-scrim"),
                                         opacity: openInfoStop ? 1 : 0,
                                         pointerEvents: openInfoStop ? "auto" : "none",
                                         transition:
