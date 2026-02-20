@@ -87,8 +87,7 @@
             }
 
             /* ─── Design tokens (dark mode) ──────────────────────── */
-            @media (prefers-color-scheme: dark) {
-                :root {
+            html.dark {
                     /* Background */
                     --color-bg-primary: #100F0F;
                     --color-bg-secondary: #1C1B1A;
@@ -157,8 +156,7 @@
                     --shadow-overlay: 0 2px 12px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.06);
                     --shadow-card: 0 2px 12px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.06);
                     --shadow-badge: 0 0 4px 0 rgba(0, 0, 0, 0.60);
-                    --shadow-toggle-knob: 0 1px 3px rgba(0,0,0,.3);
-                }
+                --shadow-toggle-knob: 0 1px 3px rgba(0,0,0,.3);
             }
 
             *,
@@ -177,7 +175,9 @@
             }
             body {
                 background: var(--color-bg-primary);
+                color: var(--color-text-default);
                 -webkit-font-smoothing: antialiased;
+                transition: background .3s ease, color .3s ease;
             }
             ::-webkit-scrollbar {
                 width: 0;
@@ -276,6 +276,17 @@
                 document.body.prepend(d);
             };
         </script>
+        <script>
+            // Theme init — runs before React to avoid flash of wrong theme
+            (function () {
+                var saved = null;
+                try { saved = localStorage.getItem("theme"); } catch (e) {}
+                var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                if (saved === "dark" || (!saved && prefersDark)) {
+                    document.documentElement.classList.add("dark");
+                }
+            })();
+        </script>
         <script type="text/babel" data-type="module">
             const { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } = React;
 
@@ -287,13 +298,14 @@
             function cssVar(name) {
                 return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
             }
-            const BG = cssVar("--color-bg-primary");
-            const BORDER = cssVar("--color-border-default");
-            const SUBTLE = cssVar("--color-text-subtle");
-            const PRIMARY = cssVar("--color-text-default");
-            const ICON_NORMAL = cssVar("--color-icon-normal");
-            const ICON_SUBTLE = cssVar("--color-icon-subtle");
-            const ICON_INVERSE = cssVar("--color-icon-inverse");
+            // Mutable theme vars — refreshed when light/dark mode toggles
+            let BG = cssVar("--color-bg-primary");
+            let BORDER = cssVar("--color-border-default");
+            let SUBTLE = cssVar("--color-text-subtle");
+            let PRIMARY = cssVar("--color-text-default");
+            let ICON_NORMAL = cssVar("--color-icon-normal");
+            let ICON_SUBTLE = cssVar("--color-icon-subtle");
+            let ICON_INVERSE = cssVar("--color-icon-inverse");
 
             // Gradient segment colors: track (stroke/ring) and bg (dot fill)
             // Maps to accent/[color]/subtle and accent/[color]/subtlest tokens
@@ -302,13 +314,13 @@
                 const h = hex.replace("#", "");
                 return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
             }
-            const TRACK_RGB = [
+            let TRACK_RGB = [
                 hexToRgbArray(cssVar("--color-bg-accent-orange-subtle")),  // orange
                 hexToRgbArray(cssVar("--color-bg-accent-yellow-subtle")),  // yellow
                 hexToRgbArray(cssVar("--color-bg-accent-blue-subtle")),    // blue
                 hexToRgbArray(cssVar("--color-bg-accent-purple-subtle")),  // purple
             ];
-            const BG_RGB = [
+            let BG_RGB = [
                 hexToRgbArray(cssVar("--color-bg-accent-orange-subtlest")),  // orange bg
                 hexToRgbArray(cssVar("--color-bg-accent-yellow-subtlest")),  // yellow bg
                 hexToRgbArray(cssVar("--color-bg-accent-blue-subtlest")),    // blue bg
@@ -439,42 +451,101 @@
                 ];
             }
 
-            // Enforce AA contrast (4.5:1) against white text by darkening if needed
-            function enforceAADark(hexColor) {
+            // Enforce AA contrast (4.5:1) against a reference surface by
+            // darkening (light mode) or lightening (dark mode) as needed.
+            function enforceAAContrast(hexColor, dark) {
                 const [r, g, b] = hexToRgb(hexColor);
                 let [h, s, l] = rgbToHsl(r, g, b);
-                const whiteLum = 1;
-                // Darken until contrast ratio >= 4.5 with white
-                while (l > 5) {
-                    const [tr, tg, tb] = hslToRgb(h, s, l);
-                    const lum = luminance(tr, tg, tb);
-                    if (contrastRatio(whiteLum, lum) >= 4.5) break;
-                    l -= 1;
+                // Reference luminance: light surface ≈ 1, dark surface ≈ 0.05
+                const surfaceLum = dark ? 0.05 : 1;
+                if (dark) {
+                    // Lighten until contrast ≥ 4.5 against dark surface
+                    while (l < 95) {
+                        const [tr, tg, tb] = hslToRgb(h, s, l);
+                        const lum = luminance(tr, tg, tb);
+                        if (contrastRatio(lum, surfaceLum) >= 4.5) break;
+                        l += 1;
+                    }
+                } else {
+                    // Darken until contrast ≥ 4.5 against white surface
+                    while (l > 5) {
+                        const [tr, tg, tb] = hslToRgb(h, s, l);
+                        const lum = luminance(tr, tg, tb);
+                        if (contrastRatio(surfaceLum, lum) >= 4.5) break;
+                        l -= 1;
+                    }
                 }
                 const [fr, fg, fb] = hslToRgb(h, s, l);
                 return rgbToHex(fr, fg, fb);
             }
 
-            // Derive accent palette from a single hex color
+            function isDarkMode() {
+                return document.documentElement.classList.contains("dark");
+            }
+
+            // Derive accent palette from a single hex color, adapting to current theme.
             function deriveAccent(inputHex) {
-                const bold = enforceAADark(inputHex);
+                const dark = isDarkMode();
+                const bold = enforceAAContrast(inputHex, dark);
                 const [r, g, b] = hexToRgb(bold);
                 const [h, s, l] = rgbToHsl(r, g, b);
-                // Text variant: slightly darker
+
+                if (dark) {
+                    // Text variant: slightly lighter
+                    const textRgb = hslToRgb(h, Math.min(s + 5, 100), Math.min(l + 8, 100));
+                    const text = rgbToHex(...textRgb);
+                    // Dark BG variant: very dark, faintly tinted
+                    const bgRgb = hslToRgb(h, Math.min(s * 0.4, 30), 14);
+                    const bg = rgbToHex(...bgRgb);
+                    // Border variant: medium-dark, muted
+                    const borderRgb = hslToRgb(h, Math.min(s * 0.45, 40), 35);
+                    const border = rgbToHex(...borderRgb);
+                    return { bold, text, bg, border };
+                }
+
+                // Light mode (original logic)
                 const textRgb = hslToRgb(h, Math.min(s + 5, 100), Math.max(l - 8, 0));
                 const text = rgbToHex(...textRgb);
-                // Light BG variant: very desaturated, high lightness
                 const bgRgb = hslToRgb(h, Math.min(s * 0.35, 30), 91);
                 const bg = rgbToHex(...bgRgb);
-                // Border variant: medium desaturated
                 const borderRgb = hslToRgb(h, Math.min(s * 0.55, 50), 72);
                 const border = rgbToHex(...borderRgb);
                 return { bold, text, bg, border };
             }
 
-            const DEFAULT_ACCENT = cssVar("--color-bg-success-bold");
-            const LINK = cssVar("--color-link-default");
-            const SUBTLEST = cssVar("--color-text-subtlest");
+            let DEFAULT_ACCENT = cssVar("--color-bg-success-bold");
+            let LINK = cssVar("--color-link-default");
+            let SUBTLEST = cssVar("--color-text-subtlest");
+
+            // Re-read all theme-dependent module-level vars from CSS custom properties
+            function refreshThemeVars() {
+                BG = cssVar("--color-bg-primary");
+                BORDER = cssVar("--color-border-default");
+                SUBTLE = cssVar("--color-text-subtle");
+                PRIMARY = cssVar("--color-text-default");
+                ICON_NORMAL = cssVar("--color-icon-normal");
+                ICON_SUBTLE = cssVar("--color-icon-subtle");
+                ICON_INVERSE = cssVar("--color-icon-inverse");
+                DEFAULT_ACCENT = cssVar("--color-bg-success-bold");
+                LINK = cssVar("--color-link-default");
+                SUBTLEST = cssVar("--color-text-subtlest");
+                TRACK_RGB = [
+                    hexToRgbArray(cssVar("--color-bg-accent-orange-subtle")),
+                    hexToRgbArray(cssVar("--color-bg-accent-yellow-subtle")),
+                    hexToRgbArray(cssVar("--color-bg-accent-blue-subtle")),
+                    hexToRgbArray(cssVar("--color-bg-accent-purple-subtle")),
+                ];
+                BG_RGB = [
+                    hexToRgbArray(cssVar("--color-bg-accent-orange-subtlest")),
+                    hexToRgbArray(cssVar("--color-bg-accent-yellow-subtlest")),
+                    hexToRgbArray(cssVar("--color-bg-accent-blue-subtlest")),
+                    hexToRgbArray(cssVar("--color-bg-accent-purple-subtlest")),
+                ];
+                COMPLETE_TRACK = cssVar("--color-bg-accent-green-subtle") || "#BEC97E";
+                COMPLETE_BG = cssVar("--color-bg-accent-green-subtlest") || "#EDEECF";
+                GROUP_BG = cssVar("--color-bg-secondary");
+                IM_TYPES = buildIMTypes();
+            }
 
             // ─── Font options ─────────────────────────────────────────
             const FONT_OPTIONS = [
@@ -752,8 +823,8 @@
             );
 
             // ─── Progress Pill ──────────────────────────────────────────
-            const COMPLETE_TRACK = cssVar("--color-bg-accent-green-subtle") || "#BEC97E";
-            const COMPLETE_BG = cssVar("--color-bg-accent-green-subtlest") || "#EDEECF";
+            let COMPLETE_TRACK = cssVar("--color-bg-accent-green-subtle") || "#BEC97E";
+            let COMPLETE_BG = cssVar("--color-bg-accent-green-subtlest") || "#EDEECF";
 
             function ProgressPill({
                 dayNumber,
@@ -761,6 +832,7 @@
                 progress,
                 isComplete = false,
                 hideTrack = false,
+                isDark = false,
             }) {
                 const canvasRef = useRef(null);
                 const ctxRef = useRef(null);
@@ -871,7 +943,7 @@
                         ctx.lineTo(p2.x + dx * ov, p2.y + dy * ov);
                         ctx.stroke();
                     }
-                }, [progress, ready, isComplete]);
+                }, [progress, ready, isComplete, isDark]);
 
                 useEffect(() => {
                     if (!ready) return;
@@ -941,7 +1013,7 @@
                     return () => {
                         if (rafRef.current) cancelAnimationFrame(rafRef.current);
                     };
-                }, [ready]);
+                }, [ready, isDark]);
 
                 const labelColor = PRIMARY;
 
@@ -1830,34 +1902,37 @@
             }
 
             // ─── IM type definitions ─────────────────────────────────────
-            const IM_TYPES = {
-                scenery: {
-                    label: "Scenery",
-                    badgeBg: cssVar("--color-bg-accent-green-subtler"),     // background/accent/green/subtler
-                    iconColor: cssVar("--color-bg-accent-green-bolder"),    // icon/success (green-600)
-                    Icon: SceneryIcon,
-                },
-                attention: {
-                    label: "Attention",
-                    badgeBg: cssVar("--color-bg-accent-yellow-subtler"),    // background/accent/yellow/subtler
-                    iconColor: cssVar("--color-bg-accent-yellow-bolder"),   // icon/warning (yellow-600)
-                    Icon: AttentionIcon,
-                },
-                fyi: { label: "FYI", badgeBg: cssVar("--color-bg-accent-blue-subtler"), iconColor: cssVar("--color-bg-accent-blue-bolder"), Icon: FyiIcon },
-                warning: {
-                    label: "Warning",
-                    badgeBg: cssVar("--color-bg-accent-orange-subtler"),    // background/accent/orange/subtler
-                    iconColor: cssVar("--color-bg-accent-orange-bolder"),   // icon/accent/orange (orange-600)
-                    Icon: WarningIcon,
-                },
-                welcome_to: {
-                    label: "Welcome to",
-                    badgeBg: cssVar("--color-bg-accent-purple-subtler"),    // background/accent/purple/subtler
-                    iconColor: cssVar("--color-bg-accent-purple-bolder"),   // icon/discovery (purple-600)
-                    Icon: WelcomeToIcon,
-                },
-                custom: { label: null, badgeBg: null, iconColor: null, Icon: CustomIMIcon },
-            };
+            function buildIMTypes() {
+                return {
+                    scenery: {
+                        label: "Scenery",
+                        badgeBg: cssVar("--color-bg-accent-green-subtler"),     // background/accent/green/subtler
+                        iconColor: cssVar("--color-bg-accent-green-bolder"),    // icon/success (green-600)
+                        Icon: SceneryIcon,
+                    },
+                    attention: {
+                        label: "Attention",
+                        badgeBg: cssVar("--color-bg-accent-yellow-subtler"),    // background/accent/yellow/subtler
+                        iconColor: cssVar("--color-bg-accent-yellow-bolder"),   // icon/warning (yellow-600)
+                        Icon: AttentionIcon,
+                    },
+                    fyi: { label: "FYI", badgeBg: cssVar("--color-bg-accent-blue-subtler"), iconColor: cssVar("--color-bg-accent-blue-bolder"), Icon: FyiIcon },
+                    warning: {
+                        label: "Warning",
+                        badgeBg: cssVar("--color-bg-accent-orange-subtler"),    // background/accent/orange/subtler
+                        iconColor: cssVar("--color-bg-accent-orange-bolder"),   // icon/accent/orange (orange-600)
+                        Icon: WarningIcon,
+                    },
+                    welcome_to: {
+                        label: "Welcome to",
+                        badgeBg: cssVar("--color-bg-accent-purple-subtler"),    // background/accent/purple/subtler
+                        iconColor: cssVar("--color-bg-accent-purple-bolder"),   // icon/discovery (purple-600)
+                        Icon: WelcomeToIcon,
+                    },
+                    custom: { label: null, badgeBg: null, iconColor: null, Icon: CustomIMIcon },
+                };
+            }
+            let IM_TYPES = buildIMTypes();
 
             // ─── Whereabouts logo ──────────────────────────────────────────
             function WaLogo({ size = 24 }) {
@@ -2077,7 +2152,7 @@
                                     width: 80,
                                     height: 140,
                                     background:
-                                        "linear-gradient(to right, rgba(247,246,237,0) 0%, " +
+                                        "linear-gradient(to right, " + GROUP_BG + "00 0%, " +
                                         GROUP_BG +
                                         " 100%)",
                                     pointerEvents: "none",
@@ -2134,7 +2209,7 @@
             }
 
             // ─── Stop Group card ────────────────────────────────────────
-            const GROUP_BG = cssVar("--color-bg-secondary");
+            let GROUP_BG = cssVar("--color-bg-secondary");
 
             function StopGroupCard({
                 group,
@@ -3839,9 +3914,9 @@
             }
 
             // ─── Accent color picker pill ───────────────────────────────
-            function AccentPicker({ accentHex, onChange }) {
+            function AccentPicker({ accentHex, onChange, isDark }) {
                 const inputRef = useRef(null);
-                const accent = useMemo(() => deriveAccent(accentHex), [accentHex]);
+                const accent = useMemo(() => deriveAccent(accentHex), [accentHex, isDark]);
                 return (
                     <div
                         style={{
@@ -3930,6 +4005,63 @@
                             }}
                         >
                             {label}
+                        </span>
+                    </div>
+                );
+            }
+
+            // ─── Theme (light / dark) picker pill ────────────────────────
+            function ThemePicker({ isDark, onChange }) {
+                // Sun icon (light mode indicator)
+                var SunIcon = React.createElement("svg", {
+                    width: 16, height: 16, viewBox: "0 0 24 24", fill: "none",
+                    stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round",
+                }, React.createElement("circle", { cx: 12, cy: 12, r: 5 }),
+                    React.createElement("line", { x1: 12, y1: 1, x2: 12, y2: 3 }),
+                    React.createElement("line", { x1: 12, y1: 21, x2: 12, y2: 23 }),
+                    React.createElement("line", { x1: 4.22, y1: 4.22, x2: 5.64, y2: 5.64 }),
+                    React.createElement("line", { x1: 18.36, y1: 18.36, x2: 19.78, y2: 19.78 }),
+                    React.createElement("line", { x1: 1, y1: 12, x2: 3, y2: 12 }),
+                    React.createElement("line", { x1: 21, y1: 12, x2: 23, y2: 12 }),
+                    React.createElement("line", { x1: 4.22, y1: 19.78, x2: 5.64, y2: 18.36 }),
+                    React.createElement("line", { x1: 18.36, y1: 5.64, x2: 19.78, y2: 4.22 }),
+                );
+                // Moon icon (dark mode indicator)
+                var MoonIcon = React.createElement("svg", {
+                    width: 16, height: 16, viewBox: "0 0 24 24", fill: "none",
+                    stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round",
+                }, React.createElement("path", { d: "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" }));
+
+                return (
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            background: cssVar("--color-elevation-surface"),
+                            borderRadius: 999,
+                            padding: "8px 14px",
+                            boxShadow: cssVar("--shadow-overlay"),
+                            cursor: "pointer",
+                            transition: "box-shadow .2s ease",
+                            userSelect: "none",
+                            color: PRIMARY,
+                        }}
+                        onClick={function () { onChange(!isDark); }}
+                        title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                    >
+                        {isDark ? SunIcon : MoonIcon}
+                        <span
+                            style={{
+                                fontFamily: "var(--body-font, 'Outfit'), sans-serif",
+                                fontWeight: 500,
+                                fontSize: 13,
+                                color: PRIMARY,
+                                lineHeight: "20px",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {isDark ? "Light" : "Dark"}
                         </span>
                     </div>
                 );
@@ -4081,7 +4213,23 @@
                 const [mobileView, setMobileView] = useState("itinerary"); // "itinerary" | "map"
                 const [openInfoStop, setOpenInfoStop] = useState(null);
                 const [lightboxSrc, setLightboxSrc] = useState(null);
-                const accent = useMemo(() => deriveAccent(accentHex), [accentHex]);
+                const [isDark, setIsDark] = useState(
+                    document.documentElement.classList.contains("dark"),
+                );
+                const accent = useMemo(() => deriveAccent(accentHex), [accentHex, isDark]);
+
+                // Handle theme toggle
+                const handleThemeChange = useCallback(function (dark) {
+                    if (dark) {
+                        document.documentElement.classList.add("dark");
+                    } else {
+                        document.documentElement.classList.remove("dark");
+                    }
+                    try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
+                    // Re-read all CSS-variable-derived module-level constants
+                    refreshThemeVars();
+                    setIsDark(dark);
+                }, []);
 
                 // Sync font CSS variable to document root
                 useEffect(
@@ -4515,6 +4663,7 @@
                             progress={progress}
                             isComplete={itineraryComplete}
                             hideTrack={isMobile && mobileView === "map"}
+                            isDark={isDark}
                         />
                         {isMobile && (
                             <MobileViewToggle view={mobileView} onToggle={handleViewToggle} />
@@ -4698,8 +4847,9 @@
                                         alignItems: "center",
                                     }}
                                 >
-                                    <AccentPicker accentHex={accentHex} onChange={setAccentHex} />
+                                    <AccentPicker accentHex={accentHex} onChange={setAccentHex} isDark={isDark} />
                                     <FontPicker fontIndex={fontIndex} onChange={setFontIndex} />
+                                    <ThemePicker isDark={isDark} onChange={handleThemeChange} />
                                 </div>
                                 {itineraryContent}
 
