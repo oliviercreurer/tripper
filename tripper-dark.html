@@ -461,6 +461,8 @@
                         if (contrastRatio(lum, surfaceLum) >= 4.5) break;
                         l += 1;
                     }
+                    // Desaturate to avoid neon — cap at 55% of original
+                    s = Math.min(s, s * 0.55);
                 } else {
                     // Darken until contrast ≥ 4.5 against white surface
                     while (l > 5) {
@@ -4674,7 +4676,6 @@
                                 toolbar={isMobile ? (
                                     <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                                         <ThemePicker isDark={isDark} onChange={handleThemeChange} />
-                                        <AccentPicker accentHex={accentHex} onChange={setAccentHex} isDark={isDark} />
                                         <FontPicker fontIndex={fontIndex} onChange={setFontIndex} />
                                     </div>
                                 ) : null}
