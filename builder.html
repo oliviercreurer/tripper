@@ -1,0 +1,1638 @@
+<!doctype html>
+<html lang="en" style="--body-font: &quot;Outfit&quot;">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Builder</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Platypi:wght@400;500;600&family=Lato:wght@400;700;900&family=JetBrains+Mono:wght@400&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            /* ─── Design tokens (light mode) ─────────────────────── */
+            :root {
+                /* Background — base */
+                --color-bg-primary: #FFFDF6;
+                --color-bg-secondary: #F7F6ED;
+                --color-bg-inverted: #100F0F;
+                --color-bg-inverted-hovered: #282726;
+                --color-bg-neutral-subtler: #E6E4D9;
+                --color-bg-neutral-bold: #6F6E69;
+                --color-bg-disabled: #E6E4D9;
+                --color-bg-input: #F7F6ED;
+
+                /* Background — selected */
+                --color-bg-selected-bold: #205EA6;
+
+                /* Background — accent */
+                --color-bg-accent-orange-subtlest: #FFE7CE;
+                --color-bg-accent-orange-subtler: #FED3AF;
+                --color-bg-accent-orange-subtle: #F9AE77;
+                --color-bg-accent-orange-bolder: #BC5215;
+                --color-bg-accent-yellow-subtlest: #FAEEC6;
+                --color-bg-accent-yellow-subtler: #F6E2A0;
+                --color-bg-accent-yellow-subtle: #ECCB60;
+                --color-bg-accent-yellow-bolder: #AD8301;
+                --color-bg-accent-green-subtlest: #EDEECF;
+                --color-bg-accent-green-subtler: #DDE2B2;
+                --color-bg-accent-green-subtle: #BEC97E;
+                --color-bg-accent-green-bolder: #66800B;
+                --color-bg-accent-blue-subtlest: #E1ECEB;
+                --color-bg-accent-blue-subtler: #C6DDE8;
+                --color-bg-accent-blue-subtle: #92BFDB;
+                --color-bg-accent-blue-bolder: #205EA6;
+                --color-bg-accent-purple-subtlest: #F0EAEC;
+                --color-bg-accent-purple-subtler: #E2D9E9;
+                --color-bg-accent-purple-subtle: #C4B9E0;
+                --color-bg-accent-purple-bolder: #5E409D;
+
+                /* Background — success */
+                --color-bg-success-bold: #66800B;
+                --color-bg-success-bold-hovered: #536907;
+
+                /* Text */
+                --color-text-default: #100F0F;
+                --color-text-subtle: #6F6E69;
+                --color-text-subtlest: #B7B5AC;
+                --color-text-disabled: #B7B5AC;
+                --color-text-inverse: #FFFDF6;
+                --color-text-selected: #205EA6;
+                --color-text-information: #205EA6;
+                --color-text-accent-green: #66800B;
+                --color-text-accent-green-bolder: #536907;
+                --color-text-accent-purple: #5E409D;
+                --color-text-accent-yellow: #AD8301;
+
+                /* Icon */
+                --color-icon-normal: #100F0F;
+                --color-icon-subtle: #6F6E69;
+                --color-icon-subtlest: #B7B5AC;
+                --color-icon-inverse: #FFFDF6;
+
+                /* Border */
+                --color-border-default: #DAD8CE;
+                --color-border-bold: #B7B5AC;
+                --color-border-boldest: #100F0F;
+                --color-border-inverse: #FFFDF6;
+                --color-border-input: #DAD8CE;
+                --color-border-accent-green: #66800B;
+                --color-border-accent-purple: #5E409D;
+                --color-border-accent-yellow: #AD8301;
+                --color-border-selected: #205EA6;
+
+                /* Link */
+                --color-link-default: #24837B;
+
+                /* Elevation / surfaces */
+                --color-elevation-surface: #FFFFFF;
+
+                /* Opacity overlays */
+                --color-overlay-scrim: rgba(255, 253, 246, 0.7);
+                --color-overlay-blur-bg: rgba(255, 253, 246, 0.55);
+
+                /* Shadows */
+                --shadow-overlay: 0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);
+                --shadow-card: 0 2px 12px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);
+                --shadow-badge: 0 0 4px 0 rgba(0, 0, 0, 0.40);
+                --shadow-toggle-knob: 0 1px 3px rgba(0,0,0,.15);
+            }
+
+            /* ─── Design tokens (dark mode) ──────────────────────── */
+            html.dark {
+                --color-bg-primary: #100F0F;
+                --color-bg-secondary: #1C1B1A;
+                --color-bg-inverted: #FFFDF6;
+                --color-bg-inverted-hovered: #F7F6ED;
+                --color-bg-neutral-subtler: #282726;
+                --color-bg-neutral-bold: #B7B5AC;
+                --color-bg-disabled: #343331;
+                --color-bg-input: #1C1B1A;
+
+                --color-bg-selected-bold: #4385BE;
+
+                --color-bg-accent-orange-subtlest: #27180E;
+                --color-bg-accent-orange-subtler: #40200D;
+                --color-bg-accent-orange-subtle: #71320D;
+                --color-bg-accent-orange-bolder: #EC8B49;
+                --color-bg-accent-yellow-subtlest: #241E08;
+                --color-bg-accent-yellow-subtler: #3A2D04;
+                --color-bg-accent-yellow-subtle: #664D01;
+                --color-bg-accent-yellow-bolder: #DFB431;
+                --color-bg-accent-green-subtlest: #1A1E0C;
+                --color-bg-accent-green-subtler: #252D09;
+                --color-bg-accent-green-subtle: #3D4C07;
+                --color-bg-accent-green-bolder: #A0AF54;
+                --color-bg-accent-blue-subtlest: #101A24;
+                --color-bg-accent-blue-subtler: #12253B;
+                --color-bg-accent-blue-subtle: #163B66;
+                --color-bg-accent-blue-bolder: #66A0C8;
+                --color-bg-accent-purple-subtlest: #1A1623;
+                --color-bg-accent-purple-subtler: #261C39;
+                --color-bg-accent-purple-subtle: #3C2A62;
+                --color-bg-accent-purple-bolder: #A699D0;
+
+                --color-bg-success-bold: #A0AF54;
+                --color-bg-success-bold-hovered: #BEC97E;
+
+                --color-text-default: #CECDC3;
+                --color-text-subtle: #878580;
+                --color-text-subtlest: #575653;
+                --color-text-disabled: #575653;
+                --color-text-inverse: #100F0F;
+                --color-text-selected: #66A0C8;
+                --color-text-information: #66A0C8;
+                --color-text-accent-green: #A0AF54;
+                --color-text-accent-green-bolder: #BEC97E;
+                --color-text-accent-purple: #A699D0;
+                --color-text-accent-yellow: #DFB431;
+
+                --color-icon-normal: #CECDC3;
+                --color-icon-subtle: #878580;
+                --color-icon-subtlest: #575653;
+                --color-icon-inverse: #100F0F;
+
+                --color-border-default: #343331;
+                --color-border-bold: #6F6E69;
+                --color-border-boldest: #CECDC3;
+                --color-border-inverse: #100F0F;
+                --color-border-input: #343331;
+                --color-border-accent-green: #879A39;
+                --color-border-accent-purple: #A699D0;
+                --color-border-accent-yellow: #DFB431;
+                --color-border-selected: #4385BE;
+
+                --color-link-default: #3AA99F;
+
+                --color-elevation-surface: #1C1B1A;
+
+                --color-overlay-scrim: rgba(16, 15, 15, 0.7);
+                --color-overlay-blur-bg: rgba(16, 15, 15, 0.55);
+
+                --shadow-overlay: 0 2px 12px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.06);
+                --shadow-card: 0 2px 12px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.06);
+                --shadow-badge: 0 0 4px 0 rgba(0, 0, 0, 0.60);
+                --shadow-toggle-knob: 0 1px 3px rgba(0,0,0,.3);
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            html,
+            body,
+            #root {
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+            body {
+                background: var(--color-bg-primary);
+                color: var(--color-text-default);
+                font-family: var(--body-font), sans-serif;
+                -webkit-font-smoothing: antialiased;
+                transition: background .3s ease, color .3s ease;
+            }
+            ::-webkit-scrollbar {
+                width: 0;
+                height: 0;
+                background: transparent;
+            }
+            input, select, textarea, button {
+                font-family: inherit;
+                font-size: inherit;
+                color: inherit;
+            }
+
+            /* ─── Drag & drop animations ──────────────────────────── */
+            @keyframes indicator-expand {
+                from { height: 0; opacity: 0; }
+                to   { height: 48px; opacity: 1; }
+            }
+            @keyframes row-settle {
+                0%   { transform: scale(0.97); box-shadow: 0 0 0 2px var(--color-border-selected); }
+                100% { transform: scale(1);    box-shadow: 0 0 0 0 transparent; }
+            }
+            .stop-row {
+                transition: background .2s ease, opacity .2s ease, transform .15s ease,
+                            box-shadow .2s ease, border-color .2s ease;
+            }
+            .stop-row:hover:not(.is-dragging) {
+                background: var(--color-bg-neutral-subtler) !important;
+                border-color: var(--color-border-bold) !important;
+            }
+            .stop-row.is-dragging {
+                transform: scale(0.97);
+            }
+            .stop-row.just-dropped {
+                animation: row-settle .35s ease-out;
+            }
+            .group-row {
+                transition: opacity .2s ease, transform .15s ease, border-color .2s ease;
+            }
+            .group-row:hover:not(.is-dragging) {
+                border-color: var(--color-border-bold) !important;
+            }
+            .group-row:hover:not(.is-dragging) .group-row-header {
+                background: var(--color-bg-neutral-subtler);
+            }
+            .group-row-header {
+                transition: background .2s ease;
+            }
+            .group-row.is-dragging {
+                transform: scale(0.97);
+            }
+            .accent-pill {
+                transition: background .15s ease;
+            }
+
+            /* ─── Slide-in panel ─────────────────────────────────── */
+            .slide-panel {
+                position: absolute;
+                top: 0; right: 0; bottom: 0;
+                width: 520px;
+                background: var(--color-bg-primary);
+                border: none;
+                border-left: 1px solid var(--color-border-default);
+                transform: translateX(100%);
+                transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+                z-index: 10;
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                justify-content: space-between;
+            }
+            .slide-panel.open {
+                transform: translateX(0);
+            }
+            .slide-panel-scrim {
+                position: absolute;
+                inset: 0;
+                background: var(--color-overlay-scrim);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .3s ease;
+                z-index: 9;
+            }
+            .slide-panel-scrim.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+        <script>
+            window.onerror = function (msg, url, line, col, err) {
+                var d = document.createElement("div");
+                d.style.cssText =
+                    "position:fixed;top:0;left:0;right:0;z-index:99999;background:#fee;color:#900;padding:16px;font:14px monospace;white-space:pre-wrap;max-height:40vh;overflow:auto";
+                d.textContent =
+                    "ERROR: " + msg + "\nLine: " + line + ", Col: " + col +
+                    (err && err.stack ? "\n\nStack:\n" + err.stack : "");
+                document.body.prepend(d);
+            };
+        </script>
+        <script>
+            (function () {
+                document.documentElement.classList.remove("dark");
+            })();
+        </script>
+        <script type="text/babel" data-type="module">
+            const { useState, useEffect, useRef, useCallback } = React;
+
+            /* ─── Icons ────────────────────────────────────────────── */
+
+            const Icon = ({ d, size = 16, color = "currentColor", strokeWidth = 2 }) => (
+                <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+                     stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+                    <path d={d} />
+                </svg>
+            );
+
+            const PlusIcon = (p) => <Icon d="M12 5v14M5 12h14" {...p} />;
+            const XIcon = (p) => <Icon d="M18 6L6 18M6 6l12 12" {...p} />;
+            const ArrowLeftIcon = (p) => <Icon d="M19 12H5M5 12L12 5M5 12L12 19" {...p} />;
+            const ChevronDownIcon = (p) => <Icon d="M6 9L12 15L18 9" {...p} />;
+            const HeartIcon = (p) => <Icon d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z" {...p} />;
+            const CopyIcon = (p) => <Icon d="M8 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M16 4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-2" {...p} />;
+            const DownloadIcon = (p) => <Icon d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" {...p} />;
+            const ArchiveIcon = (p) => <Icon d="M21 8v13H3V8M1 3h22v5H1zM10 12h4" {...p} />;
+            const MoreVertIcon = (p) => (
+                <svg width={p.size||16} height={p.size||16} viewBox="0 0 24 24" fill={p.color||"currentColor"}>
+                    <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                </svg>
+            );
+            const GrabIcon = ({ size = 16, color = "currentColor" }) => (
+                <svg width={size} height={size} viewBox="0 0 16 16" fill={color}>
+                    <circle cx="5.5" cy="3" r="1.2"/><circle cx="10.5" cy="3" r="1.2"/>
+                    <circle cx="5.5" cy="8" r="1.2"/><circle cx="10.5" cy="8" r="1.2"/>
+                    <circle cx="5.5" cy="13" r="1.2"/><circle cx="10.5" cy="13" r="1.2"/>
+                </svg>
+            );
+            const TableRowsIcon = ({ size = 24, color = "currentColor" }) => (
+                <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+                     stroke={color} strokeWidth={2}>
+                    <path d="M3 12H7.5H12H16.5H21M3 12V16.5M3 12V7.5M21 12V16.5M21 12V7.5M3 16.5V20.4C3 20.7314 3.26863 21 3.6 21H7.5H12H16.5H20.4C20.7314 21 21 20.7314 21 20.4V16.5M3 16.5H7.5H12H16.5H21M21 7.5V3.6C21 3.26863 20.7314 3 20.4 3H16.5H12H7.5H3.6C3.26863 3 3 3.26863 3 3.6V7.5M21 7.5H16.5H12H7.5H3" />
+                </svg>
+            );
+            const VideoIcon = ({ size = 16, color = "currentColor" }) => (
+                <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+                     stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 3.6V20.4C21 20.7314 20.7314 21 20.4 21H3.6C3.26863 21 3 20.7314 3 20.4V3.6C3 3.26863 3.26863 3 3.6 3H20.4C20.7314 3 21 3.26863 21 3.6Z" />
+                    <path d="M9.89768 8.51296C9.49769 8.28439 9 8.57321 9 9.03391V14.9661C9 15.4268 9.49769 15.7156 9.89768 15.487L15.0883 12.5209C15.4914 12.2906 15.4914 11.7094 15.0883 11.4791L9.89768 8.51296Z" />
+                </svg>
+            );
+            const ImageIcon = ({ size = 16, color = "currentColor" }) => (
+                <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+                     stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 3.6V20.4C21 20.7314 20.7314 21 20.4 21H3.6C3.26863 21 3 20.7314 3 20.4V3.6C3 3.26863 3.26863 3 3.6 3H20.4C20.7314 3 21 3.26863 21 3.6Z" />
+                    <path d="M3 16L10 13L21 18" />
+                    <path d="M16 10C14.8954 10 14 9.10457 14 8C14 6.89543 14.8954 6 16 6C17.1046 6 18 6.89543 18 8C18 9.10457 17.1046 10 16 10Z" />
+                </svg>
+            );
+            const SearchIcon = (p) => <Icon d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35" {...p} />;
+            const QuoteIcon = (p) => <Icon d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21zM15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" {...p} />;
+
+            /* ─── Shared small components ──────────────────────────── */
+
+            function Label({ children, bg, textColor, dotColor, border }) {
+                return (
+                    <span style={{
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                        width: "fit-content",
+                        padding: "1px 12px",
+                        background: bg,
+                        border: border || "1px solid rgba(190, 201, 126, 1)",
+                        borderRadius: 999,
+                        fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                        color: textColor,
+                    }}>
+                        {dotColor && <span style={{
+                            width: 6, height: 6, borderRadius: "50%",
+                            background: dotColor, flexShrink: 0,
+                        }} />}
+                        {children}
+                    </span>
+                );
+            }
+
+            function SectionHeader({ title }) {
+                return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                        <span style={{ fontSize: 16, fontWeight: 600, lineHeight: "24px", color: "var(--color-text-default)" }}>
+                            {title}
+                        </span>
+                        <div style={{ height: 2, background: "var(--color-border-boldest)" }} />
+                    </div>
+                );
+            }
+
+            /* ─── MenuBar ──────────────────────────────────────────── */
+
+            function MenuBar({ onToggleDark, isDark }) {
+                return (
+                    <header style={{
+                        height: 72, flexShrink: 0,
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "20px 32px",
+                        background: "var(--color-bg-primary)",
+                        borderBottom: "1px solid var(--color-border-default)",
+                        transition: "background .3s, border-color .3s",
+                    }}>
+                        {/* Left — breadcrumb context */}
+                        <nav style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                            {/* Org avatar */}
+                            <div style={{
+                                width: 24, height: 24, borderRadius: 6,
+                                background: "var(--color-bg-neutral-subtler)",
+                                flexShrink: 0,
+                            }} />
+                            {/* Separator */}
+                            <span style={{
+                                margin: "0 8px", color: "var(--color-text-subtlest)",
+                                fontSize: 14, userSelect: "none",
+                            }}>/</span>
+                            {/* Org name */}
+                            <span style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-default)" }}>
+                                Lakewood County
+                            </span>
+                            {/* Separator */}
+                            <span style={{
+                                margin: "0 8px", color: "var(--color-text-subtlest)",
+                                fontSize: 14, userSelect: "none",
+                            }}>/</span>
+                            {/* App selector */}
+                            <button style={{
+                                display: "flex", alignItems: "center", gap: 4,
+                                background: "none", border: "none", cursor: "pointer",
+                                fontSize: 14, fontWeight: 500, color: "var(--color-text-subtle)",
+                                padding: 0,
+                            }}>
+                                Itineraries
+                                <ChevronDownIcon size={14} color="var(--color-icon-subtle)" />
+                            </button>
+                        </nav>
+
+                        {/* Right — controls */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            <button onClick={onToggleDark} style={{
+                                display: "flex", alignItems: "center", gap: 6,
+                                padding: "6px 12px", borderRadius: 8,
+                                background: "var(--color-bg-secondary)",
+                                border: "none", borderColor: "rgba(0, 0, 0, 1)",
+                                cursor: "pointer",
+                                fontSize: 14, fontWeight: 500, color: "var(--color-text-default)",
+                            }}>
+                                {isDark ? "Light" : "Dark"}
+                            </button>
+                            <div style={{
+                                width: 32, height: 32, borderRadius: 8,
+                                background: "var(--color-bg-neutral-subtler)",
+                            }} />
+                        </div>
+                    </header>
+                );
+            }
+
+            /* ─── Sidebar ──────────────────────────────────────────── */
+
+            function Sidebar() {
+                return (
+                    <aside style={{
+                        width: 360, flexShrink: 0,
+                        background: "var(--color-bg-secondary)",
+                        padding: "80px 48px",
+                        overflowY: "auto",
+                        display: "flex", flexDirection: "column", gap: 24,
+                        borderRight: "1px solid var(--color-border-default)",
+                        transition: "background .3s",
+                    }}>
+                        {/* Top section */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                            {/* Back */}
+                            <button style={{
+                                display: "flex", alignItems: "center", gap: 6,
+                                width: "fit-content", height: 32,
+                                padding: "0 12px",
+                                background: "var(--color-bg-primary)",
+                                border: "1px solid var(--color-border-default)",
+                                borderRadius: 8,
+                                cursor: "pointer",
+                                fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                                color: "var(--color-text-default)",
+                            }}>
+                                <ArrowLeftIcon size={16} color="var(--color-icon-normal)" />
+                                Back
+                            </button>
+
+                            {/* Hero */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                <h1 style={{
+                                    fontSize: 32, fontWeight: 600, lineHeight: "40px",
+                                    letterSpacing: -0.5,
+                                    color: "var(--color-text-default)",
+                                }}>
+                                    The Sipping Tour
+                                </h1>
+                                <Label
+                                    bg="var(--color-bg-accent-green-subtlest)"
+                                    textColor="var(--color-text-accent-green-bolder)"
+                                    dotColor="var(--color-bg-accent-green-bolder)"
+                                >
+                                    Published
+                                </Label>
+                                <img src="assets/sipping-tour.png" alt="Sipping Tour" style={{
+                                    width: 264, height: 190, borderRadius: 16,
+                                    objectFit: "cover", display: "block",
+                                }} />
+                            </div>
+
+                            {/* Action buttons */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                <button style={{
+                                    height: 48, borderRadius: 8, border: "none",
+                                    background: "var(--color-bg-selected-bold)",
+                                    color: "var(--color-text-inverse)",
+                                    fontSize: 16, fontWeight: 500, lineHeight: "24px",
+                                    cursor: "pointer",
+                                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                                }}>
+                                    Share
+                                </button>
+                                <button style={{
+                                    height: 48, borderRadius: 8,
+                                    background: "var(--color-bg-primary)",
+                                    border: "1px solid var(--color-border-default)",
+                                    color: "var(--color-text-default)",
+                                    fontSize: 16, fontWeight: 500, lineHeight: "24px",
+                                    cursor: "pointer",
+                                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                                }}>
+                                    Preview
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Actions section */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ fontSize: 14, fontWeight: 600, lineHeight: "22px", color: "var(--color-text-default)" }}>
+                                    Actions
+                                </span>
+                                <div style={{ flex: 1, height: 1, background: "var(--color-border-default)" }} />
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                {[
+                                    { icon: HeartIcon, label: "Add to favorites" },
+                                    { icon: CopyIcon, label: "Duplicate" },
+                                    { icon: DownloadIcon, label: "Download PDF version" },
+                                    { icon: ArchiveIcon, label: "Archive" },
+                                ].map(({ icon: Ico, label }) => (
+                                    <button key={label} style={{
+                                        display: "flex", alignItems: "center", gap: 8,
+                                        background: "none", border: "none", cursor: "pointer",
+                                        fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                                        color: "var(--color-text-subtle)", padding: 0,
+                                    }}>
+                                        <Ico size={16} color="var(--color-icon-subtle)" />
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </aside>
+                );
+            }
+
+            /* ─── TabNav ───────────────────────────────────────────── */
+
+            function TabNav({ activeTab, onTabChange }) {
+                const tabs = ["Build", "Customize", "Settings"];
+                return (
+                    <div style={{
+                        flexShrink: 0,
+                        height: 56,
+                        padding: "0 64px",
+                        borderBottom: "1px solid var(--color-border-default)",
+                        background: "var(--color-bg-primary)",
+                        transition: "background .3s, border-color .3s",
+                        display: "flex", alignItems: "stretch",
+                    }}>
+                        <div style={{
+                            maxWidth: 720, width: "100%", margin: "0 auto",
+                            display: "flex", alignItems: "center", gap: 24,
+                        }}>
+                            {tabs.map((tab) => {
+                                const active = tab === activeTab;
+                                return (
+                                    <button key={tab} onClick={() => onTabChange(tab)} style={{
+                                        position: "relative",
+                                        background: "none", border: "none", cursor: "pointer",
+                                        fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                                        color: active ? "var(--color-text-selected)" : "var(--color-text-subtle)",
+                                        padding: "16px 0",
+                                        transition: "color .15s",
+                                    }}>
+                                        {tab}
+                                        {active && <span style={{
+                                            position: "absolute", bottom: -1, left: 0, right: 0,
+                                            height: 2,
+                                            background: "var(--color-border-selected)",
+                                            borderRadius: 1,
+                                        }} />}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            }
+
+            /* ─── Form fields ──────────────────────────────────────── */
+
+            function InputField({ label, value, onChange, placeholder, type = "text" }) {
+                const controlled = onChange !== undefined;
+                return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        <label style={{ fontSize: 14, fontWeight: 500, lineHeight: "22px", color: "var(--color-text-subtle)" }}>
+                            {label}
+                        </label>
+                        <input type={type} {...(controlled ? { value: value ?? "", onChange } : { defaultValue: value })} placeholder={placeholder} style={{
+                            height: 40, borderRadius: 6,
+                            border: "1px solid var(--color-border-input)",
+                            background: "var(--color-bg-input)",
+                            padding: "0 12px",
+                            fontSize: 16, fontWeight: 400, lineHeight: "22px",
+                            color: "var(--color-text-default)",
+                            outline: "none",
+                            transition: "border-color .15s, background .3s",
+                        }} />
+                    </div>
+                );
+            }
+
+            function SelectField({ label, value, options }) {
+                return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        <label style={{ fontSize: 14, fontWeight: 500, lineHeight: "22px", color: "var(--color-text-subtle)" }}>
+                            {label}
+                        </label>
+                        <div style={{ position: "relative" }}>
+                            <select defaultValue={value} style={{
+                                width: "100%", height: 40, borderRadius: 6,
+                                border: "1px solid var(--color-border-input)",
+                                background: "var(--color-bg-input)",
+                                padding: "0 32px 0 12px",
+                                fontSize: 16, fontWeight: 400, lineHeight: "22px",
+                                color: "var(--color-text-default)",
+                                appearance: "none", outline: "none", cursor: "pointer",
+                                transition: "border-color .15s, background .3s",
+                            }}>
+                                {options.map(o => <option key={o} value={o}>{o}</option>)}
+                            </select>
+                            <span style={{
+                                position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                                pointerEvents: "none",
+                            }}>
+                                <ChevronDownIcon size={14} color="var(--color-icon-subtle)" />
+                            </span>
+                        </div>
+                    </div>
+                );
+            }
+
+            function TextAreaField({ label }) {
+                return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        <label style={{ fontSize: 14, fontWeight: 500, lineHeight: "22px", color: "var(--color-text-subtle)" }}>
+                            {label}
+                        </label>
+                        <div style={{
+                            borderRadius: 6,
+                            border: "1px solid var(--color-border-input)",
+                            background: "var(--color-bg-input)",
+                            overflow: "hidden",
+                            transition: "border-color .15s, background .3s",
+                        }}>
+                            {/* Toolbar */}
+                            <div style={{
+                                display: "flex", alignItems: "center", gap: 4,
+                                padding: "8px 12px",
+                                borderBottom: "1px solid var(--color-border-default)",
+                            }}>
+                                {["B", "I", "U", "≡"].map((btn) => (
+                                    <button key={btn} style={{
+                                        width: 28, height: 28, borderRadius: 4,
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        background: "none", border: "none", cursor: "pointer",
+                                        fontSize: 13, fontWeight: btn === "B" ? 700 : 400,
+                                        fontStyle: btn === "I" ? "italic" : "normal",
+                                        textDecoration: btn === "U" ? "underline" : "none",
+                                        color: "var(--color-text-subtle)",
+                                    }}>
+                                        {btn}
+                                    </button>
+                                ))}
+                            </div>
+                            {/* Editable area */}
+                            <div contentEditable suppressContentEditableWarning style={{
+                                minHeight: 160, padding: 12,
+                                fontSize: 16, lineHeight: "22px",
+                                color: "var(--color-text-default)",
+                                outline: "none",
+                            }}>
+                                Book your own private driver, gather your friends, and explore Northern Alberta's meaderies, breweries, distilleries, and cocktail bars while savouring its rich, local flavours. From hands-on outdoor experiences like berry picking to vibrant city settings, discover the nature and agriculture that make these tastes truly one of a kind.
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            /* ─── Drop Indicator ──────────────────────────────────── */
+
+            function DropIndicator({ dayId, index, onDragOver, onDrop }) {
+                return (
+                    <div
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.dataTransfer.dropEffect = "move";
+                            onDragOver({ day: dayId, index });
+                        }}
+                        onDrop={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onDrop();
+                        }}
+                        style={{
+                            borderRadius: 8,
+                            border: "2px dashed var(--color-border-selected)",
+                            background: "var(--color-bg-accent-blue-subtlest)",
+                            overflow: "hidden",
+                            animation: "indicator-expand .2s ease-out forwards",
+                        }}
+                    />
+                );
+            }
+
+            /* ─── StopRow ──────────────────────────────────────────── */
+
+            function StopRow({ name, dayId, index, isDragging, justDropped, onDragStart, onDragOver, onDragEnd, showChevron = true }) {
+                const draggable = !!onDragStart;
+                const cls = "stop-row" + (isDragging ? " is-dragging" : "") + (justDropped ? " just-dropped" : "");
+                return (
+                    <div
+                        className={cls}
+                        draggable={draggable}
+                        data-item-row={index}
+                        onDragStart={draggable ? (e) => {
+                            e.dataTransfer.effectAllowed = "move";
+                            onDragStart({ day: dayId, index });
+                        } : undefined}
+                        onDragOver={draggable ? (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.dataTransfer.dropEffect = "move";
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const midY = rect.top + rect.height / 2;
+                            onDragOver({ day: dayId, index: e.clientY < midY ? index : index + 1 });
+                        } : undefined}
+                        onDragEnd={draggable ? onDragEnd : undefined}
+                        style={{
+                            display: "flex", alignItems: "center",
+                            height: 48,
+                            background: "var(--color-bg-secondary)",
+                            borderRadius: 8,
+                            padding: "0 12px",
+                            gap: 8,
+                            border: "1px solid var(--color-border-default)",
+                            opacity: isDragging ? 0.35 : 1,
+                            cursor: draggable ? "grab" : "default",
+                        }}
+                    >
+                        <GrabIcon size={16} color="var(--color-icon-subtlest)" />
+                        <Label
+                            bg="var(--color-bg-accent-green-subtlest)"
+                            textColor="var(--color-text-accent-green-bolder)"
+                        >
+                            Stop
+                        </Label>
+                        <span style={{
+                            flex: 1,
+                            fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                            color: "var(--color-text-default)",
+                            userSelect: "none",
+                        }}>
+                            {name}
+                        </span>
+                        <MoreVertIcon size={16} color="var(--color-icon-subtle)" />
+                        {showChevron && <ChevronDownIcon size={14} color="var(--color-icon-subtle)" />}
+                    </div>
+                );
+            }
+
+            /* ─── GroupRow ─────────────────────────────────────────── */
+
+            function GroupRow({ id, name, groupType, stops = [], dayId, index, isDragging, isGroupDragOver, groupDropIndex, dragSrc, onDragStart, onDragOver, onDragEnd, onGroupDragOver, onGroupDrop }) {
+                const showGroupIndicator = (i) => {
+                    if (groupDropIndex === undefined || groupDropIndex === null) return false;
+                    if (groupDropIndex !== i) return false;
+                    if (dragSrc?.groupId === id &&
+                        (dragSrc.stopIndex === i || dragSrc.stopIndex === i - 1)) return false;
+                    return true;
+                };
+                const typeLabel = groupType === "guided" ? "Guided Group" : "Options Group";
+                return (
+                    <div
+                        className={"group-row" + (isDragging ? " is-dragging" : "")}
+                        draggable
+                        data-item-row={index}
+                        onDragStart={(e) => {
+                            e.dataTransfer.effectAllowed = "move";
+                            onDragStart({ day: dayId, index });
+                        }}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.dataTransfer.dropEffect = "move";
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const midY = rect.top + rect.height / 2;
+                            onDragOver({ day: dayId, index: e.clientY < midY ? index : index + 1 });
+                        }}
+                        onDragEnd={onDragEnd}
+                        style={{
+                            display: "flex", flexDirection: "column",
+                            background: "var(--color-bg-secondary)",
+                            borderRadius: 12,
+                            border: "1px solid var(--color-border-default)",
+                            overflow: "hidden",
+                            opacity: isDragging ? 0.35 : 1,
+                            cursor: "grab",
+                        }}
+                    >
+                        {/* Header */}
+                        <div className="group-row-header" style={{
+                            display: "flex", alignItems: "center",
+                            height: 48,
+                            padding: "0 12px",
+                            gap: 8,
+                            borderBottom: "1px solid var(--color-border-default)",
+                        }}>
+                            <GrabIcon size={16} color="var(--color-icon-subtlest)" />
+                            <Label
+                                bg="var(--color-bg-accent-purple-subtlest)"
+                                border="1px solid var(--color-bg-accent-purple-subtle)"
+                                textColor="var(--color-text-accent-purple)"
+                            >
+                                {typeLabel}
+                            </Label>
+                            <span style={{
+                                flex: 1,
+                                fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                                color: "var(--color-text-default)",
+                                userSelect: "none",
+                            }}>
+                                {name}
+                            </span>
+                            <MoreVertIcon size={16} color="var(--color-icon-subtle)" />
+                        </div>
+                        {/* Body — drop zone or stops list */}
+                        <div
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                e.dataTransfer.dropEffect = "move";
+                                const rows = e.currentTarget.querySelectorAll('[data-inner-stop]');
+                                const y = e.clientY;
+                                let stopIdx = stops.length;
+                                for (const row of rows) {
+                                    const rect = row.getBoundingClientRect();
+                                    if (y <= rect.top + rect.height / 2) {
+                                        stopIdx = Number(row.dataset.innerStop);
+                                        break;
+                                    }
+                                }
+                                onGroupDragOver(stopIdx);
+                            }}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onGroupDrop();
+                            }}
+                            style={{ padding: 16 }}
+                        >
+                            {stops.length === 0 ? (
+                                <div style={{
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    minHeight: 120,
+                                    borderRadius: 8,
+                                    border: isGroupDragOver
+                                        ? "2px dashed var(--color-border-selected)"
+                                        : "1px dashed var(--color-border-default)",
+                                    background: isGroupDragOver
+                                        ? "var(--color-bg-accent-blue-subtlest)"
+                                        : "var(--color-bg-secondary)",
+                                    transition: "background .2s, border-color .2s",
+                                }}>
+                                    <button style={{
+                                        height: 32, borderRadius: 8,
+                                        padding: "0 16px",
+                                        background: "var(--color-bg-accent-blue-subtlest)",
+                                        border: "1px solid var(--color-border-selected)",
+                                        color: "var(--color-text-selected)",
+                                        fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                                        cursor: "pointer",
+                                        opacity: isGroupDragOver ? 0 : 1,
+                                        transition: "opacity .15s",
+                                    }}>
+                                        Add stops
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {stops.map((stop, stopIdx) => (
+                                        <React.Fragment key={stop.id}>
+                                            {showGroupIndicator(stopIdx) && (
+                                                <div style={{
+                                                    borderRadius: 8,
+                                                    border: "2px dashed var(--color-border-selected)",
+                                                    background: "var(--color-bg-accent-blue-subtlest)",
+                                                    overflow: "hidden",
+                                                    animation: "indicator-expand .2s ease-out forwards",
+                                                }} />
+                                            )}
+                                            <div
+                                                className="stop-row"
+                                                draggable
+                                                data-inner-stop={stopIdx}
+                                                onDragStart={(e) => {
+                                                    e.stopPropagation();
+                                                    e.dataTransfer.effectAllowed = "move";
+                                                    onDragStart({ day: dayId, groupId: id, stopIndex: stopIdx });
+                                                }}
+                                                onDragEnd={(e) => { e.stopPropagation(); onDragEnd(); }}
+                                                style={{
+                                                    display: "flex", alignItems: "center",
+                                                    height: 48,
+                                                    background: "var(--color-bg-secondary)",
+                                                    borderRadius: 8,
+                                                    padding: "0 12px",
+                                                    gap: 8,
+                                                    border: "1px solid var(--color-border-default)",
+                                                    cursor: "grab",
+                                                }}
+                                            >
+                                                <GrabIcon size={16} color="var(--color-icon-subtlest)" />
+                                                <Label bg="var(--color-bg-accent-green-subtlest)" textColor="var(--color-text-accent-green-bolder)">
+                                                    Stop
+                                                </Label>
+                                                <span style={{ flex: 1, fontSize: 14, fontWeight: 600, lineHeight: "22px", color: "var(--color-text-default)", userSelect: "none" }}>
+                                                    {stop.name}
+                                                </span>
+                                                <MoreVertIcon size={16} color="var(--color-icon-subtle)" />
+                                            </div>
+                                        </React.Fragment>
+                                    ))}
+                                    {showGroupIndicator(stops.length) && (
+                                        <div style={{
+                                            borderRadius: 8,
+                                            border: "2px dashed var(--color-border-selected)",
+                                            background: "var(--color-bg-accent-blue-subtlest)",
+                                            overflow: "hidden",
+                                            animation: "indicator-expand .2s ease-out forwards",
+                                        }} />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            }
+
+            /* ─── Accent pill button ───────────────────────────────── */
+
+            function AccentPill({ label, bg, border, textColor, onClick }) {
+                return (
+                    <button className="accent-pill" onClick={onClick} style={{
+                        height: 32, borderRadius: 8,
+                        padding: "0 12px",
+                        background: bg,
+                        border: `1px solid ${border}`,
+                        color: textColor,
+                        fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                        cursor: "pointer",
+                    }}>
+                        {label}
+                    </button>
+                );
+            }
+
+            /* ─── Plus-circle icon (rotates to become ×) ─────────── */
+
+            function PlusCircleIcon({ size = 20, color = "currentColor", style }) {
+                return (
+                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+                         stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+                         style={style}>
+                        <path d="M8 12H12M16 12H12M12 12V8M12 12V16" />
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
+                    </svg>
+                );
+            }
+
+            /* ─── Add menu (expand on click) ─────────────────────── */
+
+            function AddMenu({ onGroup }) {
+                const [open, setOpen] = React.useState(false);
+
+                const items = [
+                    { label: "Stop(s)", color: "var(--color-text-accent-green-bolder)" },
+                    { label: "Group",   color: "var(--color-text-accent-purple)", onClick: () => { setOpen(false); onGroup?.(); } },
+                    { label: "Message", color: "var(--color-text-accent-yellow)" },
+                ];
+
+                return (
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        {/* Toggle button — icon rotates 45° when open */}
+                        <button
+                            onClick={() => setOpen(o => !o)}
+                            style={{
+                                display: "flex", alignItems: "center", gap: 6,
+                                height: 32, padding: 0,
+                                background: "none", border: "none",
+                                cursor: "pointer",
+                                fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                                color: open ? "var(--color-text-subtle)" : "var(--color-text-information)",
+                                transition: "color .25s ease",
+                            }}
+                        >
+                            <PlusCircleIcon
+                                size={20}
+                                color={open ? "var(--color-icon-subtle)" : "var(--color-text-information)"}
+                                style={{
+                                    transform: open ? "rotate(45deg)" : "rotate(0deg)",
+                                    transition: "transform .25s ease",
+                                    flexShrink: 0,
+                                }}
+                            />
+                            <span style={{ whiteSpace: "nowrap" }}>
+                                {open ? "Cancel" : "Add..."}
+                            </span>
+                        </button>
+
+                        {/* Inline text buttons — fade in when open */}
+                        {items.map((item, i) => (
+                            <button key={item.label} onClick={item.onClick} style={{
+                                opacity: open ? 1 : 0,
+                                transform: open ? "translateX(0)" : "translateX(-6px)",
+                                transition: `opacity .2s ease ${0.05 * (i + 1)}s, transform .2s ease ${0.05 * (i + 1)}s`,
+                                pointerEvents: open ? "auto" : "none",
+                                background: "none", border: "none", padding: 0,
+                                cursor: "pointer",
+                                fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                                color: item.color,
+                                whiteSpace: "nowrap",
+                            }}>
+                                {item.label}
+                            </button>
+                        ))}
+                    </div>
+                );
+            }
+
+            /* ─── Status badges ───────────────────────────────────── */
+
+            function StatusBadge({ label, bg, dotColor, textColor }) {
+                return (
+                    <span style={{
+                        display: "inline-flex", alignItems: "center", gap: 6,
+                        padding: "1px 12px",
+                        background: bg, borderRadius: 999,
+                        fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                        color: textColor,
+                    }}>
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: dotColor, flexShrink: 0 }} />
+                        {label}
+                    </span>
+                );
+            }
+
+            function RequiredBadge() {
+                return <StatusBadge label="Required" bg="var(--color-bg-accent-orange-subtlest)" dotColor="var(--color-bg-accent-orange-bolder)" textColor="var(--color-bg-accent-orange-bolder)" />;
+            }
+
+            function OptionalBadge() {
+                return <StatusBadge label="Optional" bg="var(--color-bg-neutral-subtler)" dotColor="var(--color-bg-neutral-bold)" textColor="var(--color-text-default)" />;
+            }
+
+            /* ─── Radio button ────────────────────────────────────── */
+
+            function RadioOption({ label, checked, onChange }) {
+                return (
+                    <label style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        cursor: "pointer",
+                        fontSize: 16, fontWeight: 500, lineHeight: "24px",
+                        color: "var(--color-text-default)",
+                    }}>
+                        <span style={{
+                            width: 24, height: 24,
+                            borderRadius: "50%",
+                            border: checked ? "none" : "2px solid var(--color-border-bold)",
+                            background: checked ? "var(--color-bg-selected-bold)" : "none",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            flexShrink: 0,
+                            transition: "background .15s, border-color .15s",
+                        }}>
+                            {checked && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-text-inverse)" }} />}
+                        </span>
+                        <input type="radio" checked={checked} onChange={onChange}
+                               style={{ position: "absolute", opacity: 0, pointerEvents: "none" }} />
+                        {label}
+                    </label>
+                );
+            }
+
+            /* ─── Text button link ────────────────────────────────── */
+
+            function TextButtonLink({ icon: Ico, children }) {
+                return (
+                    <button style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        background: "none", border: "none", cursor: "pointer",
+                        padding: 0,
+                        fontSize: 16, fontWeight: 500, lineHeight: "24px",
+                        color: "var(--color-text-information)",
+                    }}>
+                        {Ico && <Ico size={20} color="var(--color-text-information)" />}
+                        {children}
+                    </button>
+                );
+            }
+
+            /* ─── Group description textarea (with toolbar) ───────── */
+
+            function GroupTextArea({ label, placeholder, maxLength = 200 }) {
+                const [value, setValue] = useState("");
+                return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        <label style={{ fontSize: 14, fontWeight: 500, lineHeight: "22px", color: "var(--color-text-subtle)" }}>
+                            {label}
+                        </label>
+                        <div style={{
+                            borderRadius: 6,
+                            border: "1px solid var(--color-border-input)",
+                            background: "var(--color-bg-input)",
+                            overflow: "hidden",
+                            transition: "border-color .15s, background .3s",
+                        }}>
+                            <div style={{
+                                display: "flex", alignItems: "center", gap: 4,
+                                padding: "8px 12px",
+                                borderBottom: "1px solid var(--color-border-default)",
+                            }}>
+                                {[
+                                    { label: "B", fw: 700 },
+                                    { label: "I", fs: "italic" },
+                                    { label: "U", td: "underline" },
+                                    { label: "≡" },
+                                    { label: "❝" },
+                                    { label: "❞" },
+                                ].map((btn, i) => (
+                                    <button key={i} style={{
+                                        width: 28, height: 28, borderRadius: 4,
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        background: "none", border: "none", cursor: "pointer",
+                                        fontSize: 13, fontWeight: btn.fw || 400,
+                                        fontStyle: btn.fs || "normal",
+                                        textDecoration: btn.td || "none",
+                                        color: "var(--color-text-subtle)",
+                                    }}>
+                                        {btn.label}
+                                    </button>
+                                ))}
+                            </div>
+                            <textarea
+                                value={value}
+                                onChange={e => setValue(e.target.value.slice(0, maxLength))}
+                                placeholder={placeholder}
+                                rows={5}
+                                style={{
+                                    width: "100%", resize: "vertical",
+                                    padding: 12, border: "none",
+                                    background: "transparent",
+                                    fontSize: 16, lineHeight: "22px",
+                                    color: "var(--color-text-default)",
+                                    outline: "none",
+                                    fontFamily: "inherit",
+                                }}
+                            />
+                        </div>
+
+                    </div>
+                );
+            }
+
+            /* ─── Create Group Panel ──────────────────────────────── */
+
+            function CreateGroupPanel({ open, onClose, onSave }) {
+                const [groupType, setGroupType] = useState("guided");
+                const [groupName, setGroupName] = useState("");
+
+                return (
+                    <>
+                        <div className={"slide-panel-scrim" + (open ? " open" : "")} onClick={onClose} />
+                        <div className={"slide-panel" + (open ? " open" : "")}>
+                            {/* Header */}
+                            <div style={{
+                                display: "flex", alignItems: "center", justifyContent: "space-between",
+                                height: 72, flexShrink: 0,
+                                padding: "0 40px",
+                                borderBottom: "1px solid var(--color-border-default)",
+                            }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                    <TableRowsIcon size={24} color="var(--color-icon-normal)" />
+                                    <span style={{ fontSize: 18, fontWeight: 600, lineHeight: "24px", color: "var(--color-text-default)" }}>
+                                        Create Group
+                                    </span>
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <button onClick={onClose} style={{
+                                        height: 32, padding: "0 12px", borderRadius: 8,
+                                        background: "none",
+                                        border: "1px solid var(--color-border-default)",
+                                        cursor: "pointer",
+                                        fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                                        color: "var(--color-text-default)",
+                                    }}>
+                                        Close
+                                    </button>
+                                    <button
+                                        disabled={!groupName.trim()}
+                                        onClick={() => {
+                                            onSave?.({ name: groupName.trim(), groupType });
+                                            setGroupName("");
+                                            setGroupType("guided");
+                                            onClose();
+                                        }}
+                                        style={{
+                                            height: 32, padding: "0 12px", borderRadius: 8,
+                                            background: groupName.trim() ? "var(--color-bg-selected-bold)" : "var(--color-bg-disabled)",
+                                            border: "none",
+                                            cursor: groupName.trim() ? "pointer" : "not-allowed",
+                                            fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                                            color: "var(--color-text-inverse)",
+                                            transition: "background .15s",
+                                        }}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Body */}
+                            <div style={{
+                                flex: 1, overflowY: "auto",
+                                padding: "40px 40px 200px",
+                                display: "flex", flexDirection: "column", gap: 40,
+                            }}>
+                                {/* Section: Details */}
+                                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 0, justifyContent: "space-between" }}>
+                                            <span style={{ fontSize: 16, fontWeight: 600, lineHeight: "24px", color: "var(--color-text-default)" }}>
+                                                Details
+                                            </span>
+                                            <RequiredBadge />
+                                        </div>
+                                        <p style={{ fontSize: 16, fontWeight: 400, lineHeight: "24px", color: "var(--color-text-subtle)", margin: 0 }}>
+                                            Provide key details about this group and upload media to make it shine in your itinerary.
+                                        </p>
+                                    </div>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                        <InputField label="Group name" placeholder="e.g. Morning coffee spots" value={groupName} onChange={e => setGroupName(e.target.value)} />
+                                        <GroupTextArea label="Group description" placeholder="Dear diary..." maxLength={200} />
+                                    </div>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                        <TextButtonLink icon={VideoIcon}>Upload video</TextButtonLink>
+                                        <TextButtonLink icon={ImageIcon}>Upload images</TextButtonLink>
+                                    </div>
+                                </div>
+
+                                {/* Section: Group Type */}
+                                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 0, justifyContent: "space-between" }}>
+                                            <span style={{ fontSize: 16, fontWeight: 600, lineHeight: "24px", color: "var(--color-text-default)" }}>
+                                                Group Type
+                                            </span>
+                                            <RequiredBadge />
+                                        </div>
+                                        <p style={{ fontSize: 16, fontWeight: 400, lineHeight: "24px", color: "var(--color-text-subtle)", margin: 0 }}>
+                                            Select the type of group you'd like to create. A Guided group is great for leading travellers through a curated set of stops, while an Options group is perfect for sharing suggestions (e.g. 5 great breakfast spots downtown).
+                                        </p>
+                                    </div>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                        <RadioOption label="Guided Group" checked={groupType === "guided"} onChange={() => setGroupType("guided")} />
+                                        <RadioOption label="Options Group" checked={groupType === "options"} onChange={() => setGroupType("options")} />
+                                    </div>
+                                </div>
+
+                                {/* Section: Associated Area */}
+                                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <span style={{ fontSize: 16, fontWeight: 600, lineHeight: "24px", color: "var(--color-text-default)" }}>
+                                                Associated Area
+                                            </span>
+                                            <OptionalBadge />
+                                        </div>
+                                        <p style={{ fontSize: 16, fontWeight: 400, lineHeight: "24px", color: "var(--color-text-subtle)", margin: 0 }}>
+                                            You can optionally associate this group with a geographic area (like a neighborhood, a region, a provincial park, etc.). Start by searching for an existing area; if there are no results, you'll be able to create a new area from scratch.
+                                        </p>
+                                    </div>
+                                    <InputField label="Place" placeholder="Search areas" />
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                );
+            }
+
+            /* ─── Empty day drop zone ──────────────────────────────── */
+
+            function EmptyDropZone({ isOver, onDragOver, onDrop }) {
+                return (
+                    <div
+                        onDragOver={onDragOver}
+                        onDrop={onDrop}
+                        style={{
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            height: 120, borderRadius: 8,
+                            border: isOver
+                                ? "2px dashed var(--color-border-selected)"
+                                : "1px dashed var(--color-border-default)",
+                            background: isOver
+                                ? "var(--color-bg-accent-blue-subtlest)"
+                                : "var(--color-bg-secondary)",
+                            transition: "background .2s, border-color .2s",
+                        }}
+                    >
+                        <button style={{
+                            height: 32, borderRadius: 8,
+                            padding: "0 16px",
+                            background: "var(--color-bg-accent-blue-subtlest)",
+                            border: "1px solid var(--color-border-selected)",
+                            color: "var(--color-text-selected)",
+                            fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                            cursor: "pointer",
+                            opacity: isOver ? 0 : 1,
+                            transition: "opacity .15s",
+                        }}>
+                            Add stops
+                        </button>
+                    </div>
+                );
+            }
+
+            /* ─── Day Section ──────────────────────────────────────── */
+
+            function DaySection({ title, children }) {
+                return (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                        <SectionHeader title={title} />
+                        {children}
+                    </div>
+                );
+            }
+
+            /* ─── Content Frame ────────────────────────────────────── */
+
+            function ContentFrame() {
+                const [days, setDays] = useState([
+                    { id: "day1", title: "Day 1", items: [
+                        { type: "stop", id: "stop-fairfield", name: "Fairfield Bakery" },
+                        { type: "stop", id: "stop-prairie", name: "Prairie Brunch" },
+                        { type: "stop", id: "stop-java", name: "Java Junction Café" },
+                    ]},
+                    { id: "day2", title: "Day 2", items: [] },
+                    { id: "day3", title: "Day 3", items: [] },
+                ]);
+                const [dragSource, setDragSource] = useState(null);
+                const [dropTarget, setDropTarget] = useState(null);
+                const [lastDropped, setLastDropped] = useState(null);
+                const [groupPanelOpen, setGroupPanelOpen] = useState(false);
+                const [targetDayId, setTargetDayId] = useState(null);
+                const daysRef = useRef(days);
+                daysRef.current = days;
+
+                const handleDragStart = useCallback((src) => setDragSource(src), []);
+                const handleDragOver = useCallback((tgt) => setDropTarget(tgt), []);
+                const handleDragEnd = useCallback(() => {
+                    setDragSource(null);
+                    setDropTarget(null);
+                }, []);
+
+                const handleDrop = useCallback(() => {
+                    if (!dragSource || !dropTarget) return;
+                    const srcDay = daysRef.current.find(d => d.id === dragSource.day);
+                    const movedItem = dragSource.groupId
+                        ? srcDay?.items.find(g => g.id === dragSource.groupId)?.stops[dragSource.stopIndex]
+                        : srcDay?.items[dragSource.index];
+                    setDays(prev => {
+                        const next = prev.map(d => ({
+                            ...d,
+                            items: d.items.map(item =>
+                                item.type === "group"
+                                    ? { ...item, stops: [...item.stops] }
+                                    : { ...item }
+                            ),
+                        }));
+                        const src = next.find(d => d.id === dragSource.day);
+                        const dst = next.find(d => d.id === dropTarget.day);
+                        if (!src || !dst) return prev;
+
+                        // Pull the moving item out of its source
+                        let moved;
+                        if (dragSource.groupId) {
+                            const srcGroup = src.items.find(g => g.id === dragSource.groupId && g.type === "group");
+                            if (!srcGroup) return prev;
+                            [moved] = srcGroup.stops.splice(dragSource.stopIndex, 1);
+                            moved = { type: "stop", id: moved.id, name: moved.name };
+                        } else {
+                            [moved] = src.items.splice(dragSource.index, 1);
+                        }
+
+                        // Place the moving item at its destination
+                        if (dropTarget.groupId) {
+                            const dstGroup = dst.items.find(g => g.id === dropTarget.groupId && g.type === "group");
+                            if (!dstGroup) return prev;
+                            let targetStopIdx = dropTarget.stopIndex !== undefined ? dropTarget.stopIndex : dstGroup.stops.length;
+                            if (dragSource.groupId === dropTarget.groupId && dragSource.stopIndex < targetStopIdx) {
+                                targetStopIdx--;
+                            }
+                            dstGroup.stops.splice(targetStopIdx, 0, { id: moved.id, name: moved.name });
+                        } else {
+                            let targetIdx = dropTarget.index;
+                            if (!dragSource.groupId && dragSource.day === dropTarget.day && dragSource.index < targetIdx) {
+                                targetIdx--;
+                            }
+                            dst.items.splice(targetIdx, 0, moved);
+                        }
+                        return next;
+                    });
+                    if (movedItem) {
+                        setLastDropped(movedItem.id);
+                        setTimeout(() => setLastDropped(null), 400);
+                    }
+                    setDragSource(null);
+                    setDropTarget(null);
+                }, [dragSource, dropTarget]);
+
+                const showIndicator = (dayId, atIndex) => {
+                    if (!dragSource || !dropTarget) return false;
+                    if (dropTarget.groupId) return false;
+                    if (dropTarget.day !== dayId || dropTarget.index !== atIndex) return false;
+                    if (!dragSource.groupId && dragSource.day === dayId &&
+                        (dragSource.index === atIndex || dragSource.index === atIndex - 1)) return false;
+                    return true;
+                };
+
+                const handleAddGroup = (dayId) => {
+                    setTargetDayId(dayId);
+                    setGroupPanelOpen(true);
+                };
+
+                const handleGroupCreate = ({ name, groupType }) => {
+                    const id = `group-${Date.now()}`;
+                    setDays(prev => prev.map(d =>
+                        d.id === targetDayId
+                            ? { ...d, items: [...d.items, { type: "group", id, name, groupType, stops: [] }] }
+                            : d
+                    ));
+                };
+
+                return (
+                    <>
+                    <div style={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: 32 }}>
+                        {/* Itinerary Details */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                            <SectionHeader title="Itinerary Details" />
+                            <InputField label="Itinerary name" value="The Sipping Tour" />
+                            <SelectField label="Itinerary type" value="Driving" options={["Driving", "Walking", "Cycling"]} />
+                            <TextAreaField label="Description" />
+                        </div>
+
+                        {/* Helper text */}
+                        <p style={{
+                            fontSize: 16, fontWeight: 400, lineHeight: "24px",
+                            color: "var(--color-link-default)",
+                        }}>
+                            Start sketching out your itinerary by adding stops to your day segments. Once you've added them, you'll be able to freely move them around — across days and into groups.
+                        </p>
+
+                        {days.map(day => (
+                            <DaySection key={day.id} title={day.title}>
+                                {day.items.length > 0 ? (
+                                    <div
+                                        onDragOver={(e) => {
+                                            e.preventDefault();
+                                            e.dataTransfer.dropEffect = "move";
+                                            const rows = e.currentTarget.querySelectorAll('[data-item-row]');
+                                            const y = e.clientY;
+                                            let idx = day.items.length;
+                                            for (const row of rows) {
+                                                const rect = row.getBoundingClientRect();
+                                                if (y <= rect.top + rect.height / 2) {
+                                                    idx = Number(row.dataset.itemRow);
+                                                    break;
+                                                }
+                                            }
+                                            handleDragOver({ day: day.id, index: idx });
+                                        }}
+                                        onDrop={(e) => { e.preventDefault(); handleDrop(); }}
+                                        style={{ display: "flex", flexDirection: "column", gap: 12 }}
+                                    >
+                                        {day.items.map((item, i) => (
+                                            <React.Fragment key={item.id}>
+                                                {showIndicator(day.id, i) && <DropIndicator dayId={day.id} index={i} onDragOver={handleDragOver} onDrop={handleDrop} />}
+                                                {item.type === "stop" ? (
+                                                    <StopRow
+                                                        name={item.name}
+                                                        dayId={day.id}
+                                                        index={i}
+                                                        isDragging={dragSource?.day === day.id && dragSource?.index === i}
+                                                        justDropped={lastDropped === item.id}
+                                                        onDragStart={handleDragStart}
+                                                        onDragOver={handleDragOver}
+                                                        onDragEnd={handleDragEnd}
+                                                    />
+                                                ) : (
+                                                    <GroupRow
+                                                        id={item.id}
+                                                        name={item.name}
+                                                        groupType={item.groupType}
+                                                        stops={item.stops}
+                                                        dayId={day.id}
+                                                        index={i}
+                                                        isDragging={dragSource?.day === day.id && dragSource?.index === i}
+                                                        isGroupDragOver={dropTarget?.groupId === item.id}
+                                                        groupDropIndex={dropTarget?.groupId === item.id ? dropTarget.stopIndex : undefined}
+                                                        dragSrc={dragSource}
+                                                        onDragStart={handleDragStart}
+                                                        onDragOver={handleDragOver}
+                                                        onDragEnd={handleDragEnd}
+                                                        onGroupDragOver={(stopIdx) => handleDragOver({ day: day.id, groupId: item.id, stopIndex: stopIdx })}
+                                                        onGroupDrop={handleDrop}
+                                                    />
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                        {showIndicator(day.id, day.items.length) && <DropIndicator dayId={day.id} index={day.items.length} onDragOver={handleDragOver} onDrop={handleDrop} />}
+                                        <AddMenu onGroup={() => handleAddGroup(day.id)} />
+                                    </div>
+                                ) : (
+                                    <EmptyDropZone
+                                        isOver={dragSource !== null && dropTarget?.day === day.id}
+                                        onDragOver={(e) => {
+                                            e.preventDefault();
+                                            e.dataTransfer.dropEffect = "move";
+                                            handleDragOver({ day: day.id, index: 0 });
+                                        }}
+                                        onDrop={(e) => { e.preventDefault(); handleDrop(); }}
+                                    />
+                                )}
+                            </DaySection>
+                        ))}
+                    </div>
+                    <CreateGroupPanel
+                        open={groupPanelOpen}
+                        onClose={() => setGroupPanelOpen(false)}
+                        onSave={handleGroupCreate}
+                    />
+                    </>
+                );
+            }
+
+            /* ─── Main ─────────────────────────────────────────────── */
+
+            function Main() {
+                const [activeTab, setActiveTab] = useState("Build");
+
+                return (
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                        <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
+                        <div style={{
+                            flex: 1, overflowY: "auto",
+                            padding: "48px 64px 80px",
+                            display: "flex", flexDirection: "column",
+                            justifyContent: "flex-start", alignItems: "center",
+                        }}>
+                            <ContentFrame />
+                        </div>
+                    </div>
+                );
+            }
+
+            /* ─── App ──────────────────────────────────────────────── */
+
+            function App() {
+                const [isDark, setIsDark] = useState(false);
+
+                const toggleDark = useCallback(() => {
+                    setIsDark(prev => {
+                        const next = !prev;
+                        document.documentElement.classList.toggle("dark", next);
+                        return next;
+                    });
+                }, []);
+
+                return (
+                    <div style={{
+                        display: "flex", flexDirection: "column",
+                        height: "100%", width: "100%",
+                        fontFamily: "var(--body-font), sans-serif",
+                        position: "relative",
+                    }}>
+                        <MenuBar onToggleDark={toggleDark} isDark={isDark} />
+                        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+                            <Sidebar />
+                            <Main />
+                        </div>
+                    </div>
+                );
+            }
+
+            /* ─── Mount ────────────────────────────────────────────── */
+            ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+        </script>
+    </body>
+</html>
