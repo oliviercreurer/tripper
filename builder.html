@@ -1010,11 +1010,11 @@
 
             /* ─── Add menu (expand on click) ─────────────────────── */
 
-            function AddMenu({ onGroup }) {
+            function AddMenu({ onGroup, onStop }) {
                 const [open, setOpen] = React.useState(false);
 
                 const items = [
-                    { label: "Stop(s)", color: "var(--color-text-accent-green-bolder)" },
+                    { label: "Stop(s)", color: "var(--color-text-accent-green-bolder)", onClick: () => { setOpen(false); onStop?.(); } },
                     { label: "Group",   color: "var(--color-text-accent-purple)", onClick: () => { setOpen(false); onGroup?.(); } },
                     { label: "Message", color: "var(--color-text-accent-yellow)" },
                 ];
@@ -1466,6 +1466,22 @@
                     return true;
                 };
 
+                const dummyStopNames = [
+                    "The Blue Anchor", "Rosewood Deli", "Corner Espresso", "Harbour Fish Co.",
+                    "Maple & Rye", "The Spotted Owl", "Birchwood Bakery", "Quay Street Café",
+                    "Iron & Oak", "Summit General Store",
+                ];
+
+                const handleAddStop = (dayId) => {
+                    const name = dummyStopNames[Math.floor(Math.random() * dummyStopNames.length)];
+                    const id = `stop-${Date.now()}`;
+                    setDays(prev => prev.map(d =>
+                        d.id === dayId
+                            ? { ...d, items: [...d.items, { type: "stop", id, name }] }
+                            : d
+                    ));
+                };
+
                 const handleAddGroup = (dayId) => {
                     setTargetDayId(dayId);
                     setGroupPanelOpen(true);
@@ -1557,7 +1573,7 @@
                                             </React.Fragment>
                                         ))}
                                         {showIndicator(day.id, day.items.length) && <DropIndicator dayId={day.id} index={day.items.length} onDragOver={handleDragOver} onDrop={handleDrop} />}
-                                        <AddMenu onGroup={() => handleAddGroup(day.id)} />
+                                        <AddMenu onStop={() => handleAddStop(day.id)} onGroup={() => handleAddGroup(day.id)} />
                                     </div>
                                 ) : (
                                     <EmptyDropZone
