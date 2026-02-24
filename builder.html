@@ -231,6 +231,21 @@
             .stop-row.just-dropped {
                 animation: row-settle .35s ease-out;
             }
+            .group-row {
+                transition: opacity .2s ease, transform .15s ease, border-color .2s ease;
+            }
+            .group-row:hover:not(.is-dragging) {
+                border-color: var(--color-border-bold) !important;
+            }
+            .group-row:hover:not(.is-dragging) .group-row-header {
+                background: var(--color-bg-neutral-subtler);
+            }
+            .group-row-header {
+                transition: background .2s ease;
+            }
+            .group-row.is-dragging {
+                transform: scale(0.97);
+            }
             .accent-pill {
                 transition: background .15s ease;
             }
@@ -348,14 +363,14 @@
 
             /* ─── Shared small components ──────────────────────────── */
 
-            function Label({ children, bg, textColor, dotColor }) {
+            function Label({ children, bg, textColor, dotColor, border }) {
                 return (
                     <span style={{
                         display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                         width: "fit-content",
                         padding: "1px 12px",
                         background: bg,
-                        border: "1px solid rgba(190, 201, 126, 1)",
+                        border: border || "1px solid rgba(190, 201, 126, 1)",
                         borderRadius: 999,
                         fontSize: 14, fontWeight: 600, lineHeight: "22px",
                         color: textColor,
@@ -389,7 +404,7 @@
                         display: "flex", alignItems: "center", justifyContent: "space-between",
                         padding: "20px 32px",
                         background: "var(--color-bg-primary)",
-                        borderBottom: "2px solid var(--color-border-default)",
+                        borderBottom: "1px solid var(--color-border-default)",
                         transition: "background .3s, border-color .3s",
                     }}>
                         {/* Left — breadcrumb context */}
@@ -494,9 +509,9 @@
                                 >
                                     Published
                                 </Label>
-                                <div style={{
+                                <img src="assets/sipping-tour.png" alt="Sipping Tour" style={{
                                     width: 264, height: 190, borderRadius: 16,
-                                    background: "var(--color-bg-neutral-subtler)",
+                                    objectFit: "cover", display: "block",
                                 }} />
                             </div>
 
@@ -564,48 +579,53 @@
                 return (
                     <div style={{
                         flexShrink: 0,
-                        display: "flex", alignItems: "center",
                         height: 56,
                         padding: "0 64px",
                         borderBottom: "1px solid var(--color-border-default)",
                         background: "var(--color-bg-primary)",
-                        gap: 24,
                         transition: "background .3s, border-color .3s",
+                        display: "flex", alignItems: "stretch",
                     }}>
-                        {tabs.map((tab) => {
-                            const active = tab === activeTab;
-                            return (
-                                <button key={tab} onClick={() => onTabChange(tab)} style={{
-                                    position: "relative",
-                                    background: "none", border: "none", cursor: "pointer",
-                                    fontSize: 14, fontWeight: 600, lineHeight: "22px",
-                                    color: active ? "var(--color-text-selected)" : "var(--color-text-subtle)",
-                                    padding: "16px 0",
-                                    transition: "color .15s",
-                                }}>
-                                    {tab}
-                                    {active && <span style={{
-                                        position: "absolute", bottom: -1, left: 0, right: 0,
-                                        height: 2,
-                                        background: "var(--color-border-selected)",
-                                        borderRadius: 1,
-                                    }} />}
-                                </button>
-                            );
-                        })}
+                        <div style={{
+                            maxWidth: 720, width: "100%", margin: "0 auto",
+                            display: "flex", alignItems: "center", gap: 24,
+                        }}>
+                            {tabs.map((tab) => {
+                                const active = tab === activeTab;
+                                return (
+                                    <button key={tab} onClick={() => onTabChange(tab)} style={{
+                                        position: "relative",
+                                        background: "none", border: "none", cursor: "pointer",
+                                        fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                                        color: active ? "var(--color-text-selected)" : "var(--color-text-subtle)",
+                                        padding: "16px 0",
+                                        transition: "color .15s",
+                                    }}>
+                                        {tab}
+                                        {active && <span style={{
+                                            position: "absolute", bottom: -1, left: 0, right: 0,
+                                            height: 2,
+                                            background: "var(--color-border-selected)",
+                                            borderRadius: 1,
+                                        }} />}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 );
             }
 
             /* ─── Form fields ──────────────────────────────────────── */
 
-            function InputField({ label, value, placeholder, type = "text" }) {
+            function InputField({ label, value, onChange, placeholder, type = "text" }) {
+                const controlled = onChange !== undefined;
                 return (
                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                         <label style={{ fontSize: 14, fontWeight: 500, lineHeight: "22px", color: "var(--color-text-subtle)" }}>
                             {label}
                         </label>
-                        <input type={type} defaultValue={value} placeholder={placeholder} style={{
+                        <input type={type} {...(controlled ? { value: value ?? "", onChange } : { defaultValue: value })} placeholder={placeholder} style={{
                             height: 40, borderRadius: 6,
                             border: "1px solid var(--color-border-input)",
                             background: "var(--color-bg-input)",
@@ -725,26 +745,27 @@
 
             /* ─── StopRow ──────────────────────────────────────────── */
 
-            function StopRow({ name, dayId, index, isDragging, justDropped, onDragStart, onDragOver, onDragEnd }) {
+            function StopRow({ name, dayId, index, isDragging, justDropped, onDragStart, onDragOver, onDragEnd, showChevron = true }) {
+                const draggable = !!onDragStart;
                 const cls = "stop-row" + (isDragging ? " is-dragging" : "") + (justDropped ? " just-dropped" : "");
                 return (
                     <div
                         className={cls}
-                        draggable
-                        data-stop-row={index}
-                        onDragStart={(e) => {
+                        draggable={draggable}
+                        data-item-row={index}
+                        onDragStart={draggable ? (e) => {
                             e.dataTransfer.effectAllowed = "move";
                             onDragStart({ day: dayId, index });
-                        }}
-                        onDragOver={(e) => {
+                        } : undefined}
+                        onDragOver={draggable ? (e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             e.dataTransfer.dropEffect = "move";
                             const rect = e.currentTarget.getBoundingClientRect();
                             const midY = rect.top + rect.height / 2;
                             onDragOver({ day: dayId, index: e.clientY < midY ? index : index + 1 });
-                        }}
-                        onDragEnd={onDragEnd}
+                        } : undefined}
+                        onDragEnd={draggable ? onDragEnd : undefined}
                         style={{
                             display: "flex", alignItems: "center",
                             height: 48,
@@ -754,7 +775,7 @@
                             gap: 8,
                             border: "1px solid var(--color-border-default)",
                             opacity: isDragging ? 0.35 : 1,
-                            cursor: "grab",
+                            cursor: draggable ? "grab" : "default",
                         }}
                     >
                         <GrabIcon size={16} color="var(--color-icon-subtlest)" />
@@ -773,7 +794,185 @@
                             {name}
                         </span>
                         <MoreVertIcon size={16} color="var(--color-icon-subtle)" />
-                        <ChevronDownIcon size={14} color="var(--color-icon-subtle)" />
+                        {showChevron && <ChevronDownIcon size={14} color="var(--color-icon-subtle)" />}
+                    </div>
+                );
+            }
+
+            /* ─── GroupRow ─────────────────────────────────────────── */
+
+            function GroupRow({ id, name, groupType, stops = [], dayId, index, isDragging, isGroupDragOver, groupDropIndex, dragSrc, onDragStart, onDragOver, onDragEnd, onGroupDragOver, onGroupDrop }) {
+                const showGroupIndicator = (i) => {
+                    if (groupDropIndex === undefined || groupDropIndex === null) return false;
+                    if (groupDropIndex !== i) return false;
+                    if (dragSrc?.groupId === id &&
+                        (dragSrc.stopIndex === i || dragSrc.stopIndex === i - 1)) return false;
+                    return true;
+                };
+                const typeLabel = groupType === "guided" ? "Guided Group" : "Options Group";
+                return (
+                    <div
+                        className={"group-row" + (isDragging ? " is-dragging" : "")}
+                        draggable
+                        data-item-row={index}
+                        onDragStart={(e) => {
+                            e.dataTransfer.effectAllowed = "move";
+                            onDragStart({ day: dayId, index });
+                        }}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.dataTransfer.dropEffect = "move";
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const midY = rect.top + rect.height / 2;
+                            onDragOver({ day: dayId, index: e.clientY < midY ? index : index + 1 });
+                        }}
+                        onDragEnd={onDragEnd}
+                        style={{
+                            display: "flex", flexDirection: "column",
+                            background: "var(--color-bg-secondary)",
+                            borderRadius: 12,
+                            border: "1px solid var(--color-border-default)",
+                            overflow: "hidden",
+                            opacity: isDragging ? 0.35 : 1,
+                            cursor: "grab",
+                        }}
+                    >
+                        {/* Header */}
+                        <div className="group-row-header" style={{
+                            display: "flex", alignItems: "center",
+                            height: 48,
+                            padding: "0 12px",
+                            gap: 8,
+                            borderBottom: "1px solid var(--color-border-default)",
+                        }}>
+                            <GrabIcon size={16} color="var(--color-icon-subtlest)" />
+                            <Label
+                                bg="var(--color-bg-accent-purple-subtlest)"
+                                border="1px solid var(--color-bg-accent-purple-subtle)"
+                                textColor="var(--color-text-accent-purple)"
+                            >
+                                {typeLabel}
+                            </Label>
+                            <span style={{
+                                flex: 1,
+                                fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                                color: "var(--color-text-default)",
+                                userSelect: "none",
+                            }}>
+                                {name}
+                            </span>
+                            <MoreVertIcon size={16} color="var(--color-icon-subtle)" />
+                        </div>
+                        {/* Body — drop zone or stops list */}
+                        <div
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                e.dataTransfer.dropEffect = "move";
+                                const rows = e.currentTarget.querySelectorAll('[data-inner-stop]');
+                                const y = e.clientY;
+                                let stopIdx = stops.length;
+                                for (const row of rows) {
+                                    const rect = row.getBoundingClientRect();
+                                    if (y <= rect.top + rect.height / 2) {
+                                        stopIdx = Number(row.dataset.innerStop);
+                                        break;
+                                    }
+                                }
+                                onGroupDragOver(stopIdx);
+                            }}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onGroupDrop();
+                            }}
+                            style={{ padding: 16 }}
+                        >
+                            {stops.length === 0 ? (
+                                <div style={{
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    minHeight: 120,
+                                    borderRadius: 8,
+                                    border: isGroupDragOver
+                                        ? "2px dashed var(--color-border-selected)"
+                                        : "1px dashed var(--color-border-default)",
+                                    background: isGroupDragOver
+                                        ? "var(--color-bg-accent-blue-subtlest)"
+                                        : "var(--color-bg-secondary)",
+                                    transition: "background .2s, border-color .2s",
+                                }}>
+                                    <button style={{
+                                        height: 32, borderRadius: 8,
+                                        padding: "0 16px",
+                                        background: "var(--color-bg-accent-blue-subtlest)",
+                                        border: "1px solid var(--color-border-selected)",
+                                        color: "var(--color-text-selected)",
+                                        fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                                        cursor: "pointer",
+                                        opacity: isGroupDragOver ? 0 : 1,
+                                        transition: "opacity .15s",
+                                    }}>
+                                        Add stops
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                    {stops.map((stop, stopIdx) => (
+                                        <React.Fragment key={stop.id}>
+                                            {showGroupIndicator(stopIdx) && (
+                                                <div style={{
+                                                    borderRadius: 8,
+                                                    border: "2px dashed var(--color-border-selected)",
+                                                    background: "var(--color-bg-accent-blue-subtlest)",
+                                                    overflow: "hidden",
+                                                    animation: "indicator-expand .2s ease-out forwards",
+                                                }} />
+                                            )}
+                                            <div
+                                                className="stop-row"
+                                                draggable
+                                                data-inner-stop={stopIdx}
+                                                onDragStart={(e) => {
+                                                    e.stopPropagation();
+                                                    e.dataTransfer.effectAllowed = "move";
+                                                    onDragStart({ day: dayId, groupId: id, stopIndex: stopIdx });
+                                                }}
+                                                onDragEnd={(e) => { e.stopPropagation(); onDragEnd(); }}
+                                                style={{
+                                                    display: "flex", alignItems: "center",
+                                                    height: 48,
+                                                    background: "var(--color-bg-secondary)",
+                                                    borderRadius: 8,
+                                                    padding: "0 12px",
+                                                    gap: 8,
+                                                    border: "1px solid var(--color-border-default)",
+                                                    cursor: "grab",
+                                                }}
+                                            >
+                                                <GrabIcon size={16} color="var(--color-icon-subtlest)" />
+                                                <Label bg="var(--color-bg-accent-green-subtlest)" textColor="var(--color-text-accent-green-bolder)">
+                                                    Stop
+                                                </Label>
+                                                <span style={{ flex: 1, fontSize: 14, fontWeight: 600, lineHeight: "22px", color: "var(--color-text-default)", userSelect: "none" }}>
+                                                    {stop.name}
+                                                </span>
+                                                <MoreVertIcon size={16} color="var(--color-icon-subtle)" />
+                                            </div>
+                                        </React.Fragment>
+                                    ))}
+                                    {showGroupIndicator(stops.length) && (
+                                        <div style={{
+                                            borderRadius: 8,
+                                            border: "2px dashed var(--color-border-selected)",
+                                            background: "var(--color-bg-accent-blue-subtlest)",
+                                            overflow: "hidden",
+                                            animation: "indicator-expand .2s ease-out forwards",
+                                        }} />
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 );
             }
@@ -814,14 +1013,14 @@
             function AddMenu({ onGroup }) {
                 const [open, setOpen] = React.useState(false);
 
-                const pills = [
-                    { label: "Stop(s)", bg: "var(--color-bg-accent-green-subtlest)", border: "var(--color-border-accent-green)", textColor: "var(--color-text-accent-green-bolder)" },
-                    { label: "Group",   bg: "var(--color-bg-accent-purple-subtlest)", border: "var(--color-border-accent-purple)", textColor: "var(--color-text-accent-purple)", onClick: () => { setOpen(false); onGroup?.(); } },
-                    { label: "Message", bg: "var(--color-bg-accent-yellow-subtlest)", border: "var(--color-border-accent-yellow)", textColor: "var(--color-text-accent-yellow)" },
+                const items = [
+                    { label: "Stop(s)", color: "var(--color-text-accent-green-bolder)" },
+                    { label: "Group",   color: "var(--color-text-accent-purple)", onClick: () => { setOpen(false); onGroup?.(); } },
+                    { label: "Message", color: "var(--color-text-accent-yellow)" },
                 ];
 
                 return (
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         {/* Toggle button — icon rotates 45° when open */}
                         <button
                             onClick={() => setOpen(o => !o)}
@@ -849,16 +1048,21 @@
                             </span>
                         </button>
 
-                        {/* Pills — slide in when open */}
-                        {pills.map((p, i) => (
-                            <span key={p.label} style={{
+                        {/* Inline text buttons — fade in when open */}
+                        {items.map((item, i) => (
+                            <button key={item.label} onClick={item.onClick} style={{
                                 opacity: open ? 1 : 0,
-                                transform: open ? "translateX(0)" : "translateX(-8px)",
-                                transition: `opacity .2s ease ${0.04 * (i + 1)}s, transform .2s ease ${0.04 * (i + 1)}s`,
+                                transform: open ? "translateX(0)" : "translateX(-6px)",
+                                transition: `opacity .2s ease ${0.05 * (i + 1)}s, transform .2s ease ${0.05 * (i + 1)}s`,
                                 pointerEvents: open ? "auto" : "none",
+                                background: "none", border: "none", padding: 0,
+                                cursor: "pointer",
+                                fontSize: 14, fontWeight: 600, lineHeight: "22px",
+                                color: item.color,
+                                whiteSpace: "nowrap",
                             }}>
-                                <AccentPill {...p} onClick={p.onClick} />
-                            </span>
+                                {item.label}
+                            </button>
                         ))}
                     </div>
                 );
@@ -999,8 +1203,9 @@
 
             /* ─── Create Group Panel ──────────────────────────────── */
 
-            function CreateGroupPanel({ open, onClose }) {
+            function CreateGroupPanel({ open, onClose, onSave }) {
                 const [groupType, setGroupType] = useState("guided");
+                const [groupName, setGroupName] = useState("");
 
                 return (
                     <>
@@ -1030,14 +1235,24 @@
                                     }}>
                                         Close
                                     </button>
-                                    <button style={{
-                                        height: 32, padding: "0 12px", borderRadius: 8,
-                                        background: "var(--color-bg-selected-bold)",
-                                        border: "none",
-                                        cursor: "pointer",
-                                        fontSize: 14, fontWeight: 500, lineHeight: "22px",
-                                        color: "var(--color-text-inverse)",
-                                    }}>
+                                    <button
+                                        disabled={!groupName.trim()}
+                                        onClick={() => {
+                                            onSave?.({ name: groupName.trim(), groupType });
+                                            setGroupName("");
+                                            setGroupType("guided");
+                                            onClose();
+                                        }}
+                                        style={{
+                                            height: 32, padding: "0 12px", borderRadius: 8,
+                                            background: groupName.trim() ? "var(--color-bg-selected-bold)" : "var(--color-bg-disabled)",
+                                            border: "none",
+                                            cursor: groupName.trim() ? "pointer" : "not-allowed",
+                                            fontSize: 14, fontWeight: 500, lineHeight: "22px",
+                                            color: "var(--color-text-inverse)",
+                                            transition: "background .15s",
+                                        }}
+                                    >
                                         Save
                                     </button>
                                 </div>
@@ -1063,7 +1278,7 @@
                                         </p>
                                     </div>
                                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                                        <InputField label="Group name" placeholder="Search areas" />
+                                        <InputField label="Group name" placeholder="e.g. Morning coffee spots" value={groupName} onChange={e => setGroupName(e.target.value)} />
                                         <GroupTextArea label="Group description" placeholder="Dear diary..." maxLength={200} />
                                     </div>
                                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -1161,15 +1376,21 @@
 
             /* ─── Content Frame ────────────────────────────────────── */
 
-            function ContentFrame({ onGroup }) {
+            function ContentFrame() {
                 const [days, setDays] = useState([
-                    { id: "day1", title: "Day 1", stops: ["Fairfield Bakery", "Prairie Brunch", "Java Junction Café"] },
-                    { id: "day2", title: "Day 2", stops: [] },
-                    { id: "day3", title: "Day 3", stops: [] },
+                    { id: "day1", title: "Day 1", items: [
+                        { type: "stop", id: "stop-fairfield", name: "Fairfield Bakery" },
+                        { type: "stop", id: "stop-prairie", name: "Prairie Brunch" },
+                        { type: "stop", id: "stop-java", name: "Java Junction Café" },
+                    ]},
+                    { id: "day2", title: "Day 2", items: [] },
+                    { id: "day3", title: "Day 3", items: [] },
                 ]);
                 const [dragSource, setDragSource] = useState(null);
                 const [dropTarget, setDropTarget] = useState(null);
                 const [lastDropped, setLastDropped] = useState(null);
+                const [groupPanelOpen, setGroupPanelOpen] = useState(false);
+                const [targetDayId, setTargetDayId] = useState(null);
                 const daysRef = useRef(days);
                 daysRef.current = days;
 
@@ -1183,22 +1404,53 @@
                 const handleDrop = useCallback(() => {
                     if (!dragSource || !dropTarget) return;
                     const srcDay = daysRef.current.find(d => d.id === dragSource.day);
-                    const movedName = srcDay?.stops[dragSource.index];
+                    const movedItem = dragSource.groupId
+                        ? srcDay?.items.find(g => g.id === dragSource.groupId)?.stops[dragSource.stopIndex]
+                        : srcDay?.items[dragSource.index];
                     setDays(prev => {
-                        const next = prev.map(d => ({ ...d, stops: [...d.stops] }));
+                        const next = prev.map(d => ({
+                            ...d,
+                            items: d.items.map(item =>
+                                item.type === "group"
+                                    ? { ...item, stops: [...item.stops] }
+                                    : { ...item }
+                            ),
+                        }));
                         const src = next.find(d => d.id === dragSource.day);
                         const dst = next.find(d => d.id === dropTarget.day);
                         if (!src || !dst) return prev;
-                        const [moved] = src.stops.splice(dragSource.index, 1);
-                        let targetIdx = dropTarget.index;
-                        if (dragSource.day === dropTarget.day && dragSource.index < targetIdx) {
-                            targetIdx--;
+
+                        // Pull the moving item out of its source
+                        let moved;
+                        if (dragSource.groupId) {
+                            const srcGroup = src.items.find(g => g.id === dragSource.groupId && g.type === "group");
+                            if (!srcGroup) return prev;
+                            [moved] = srcGroup.stops.splice(dragSource.stopIndex, 1);
+                            moved = { type: "stop", id: moved.id, name: moved.name };
+                        } else {
+                            [moved] = src.items.splice(dragSource.index, 1);
                         }
-                        dst.stops.splice(targetIdx, 0, moved);
+
+                        // Place the moving item at its destination
+                        if (dropTarget.groupId) {
+                            const dstGroup = dst.items.find(g => g.id === dropTarget.groupId && g.type === "group");
+                            if (!dstGroup) return prev;
+                            let targetStopIdx = dropTarget.stopIndex !== undefined ? dropTarget.stopIndex : dstGroup.stops.length;
+                            if (dragSource.groupId === dropTarget.groupId && dragSource.stopIndex < targetStopIdx) {
+                                targetStopIdx--;
+                            }
+                            dstGroup.stops.splice(targetStopIdx, 0, { id: moved.id, name: moved.name });
+                        } else {
+                            let targetIdx = dropTarget.index;
+                            if (!dragSource.groupId && dragSource.day === dropTarget.day && dragSource.index < targetIdx) {
+                                targetIdx--;
+                            }
+                            dst.items.splice(targetIdx, 0, moved);
+                        }
                         return next;
                     });
-                    if (movedName) {
-                        setLastDropped(movedName);
+                    if (movedItem) {
+                        setLastDropped(movedItem.id);
                         setTimeout(() => setLastDropped(null), 400);
                     }
                     setDragSource(null);
@@ -1207,13 +1459,29 @@
 
                 const showIndicator = (dayId, atIndex) => {
                     if (!dragSource || !dropTarget) return false;
+                    if (dropTarget.groupId) return false;
                     if (dropTarget.day !== dayId || dropTarget.index !== atIndex) return false;
-                    if (dragSource.day === dayId &&
+                    if (!dragSource.groupId && dragSource.day === dayId &&
                         (dragSource.index === atIndex || dragSource.index === atIndex - 1)) return false;
                     return true;
                 };
 
+                const handleAddGroup = (dayId) => {
+                    setTargetDayId(dayId);
+                    setGroupPanelOpen(true);
+                };
+
+                const handleGroupCreate = ({ name, groupType }) => {
+                    const id = `group-${Date.now()}`;
+                    setDays(prev => prev.map(d =>
+                        d.id === targetDayId
+                            ? { ...d, items: [...d.items, { type: "group", id, name, groupType, stops: [] }] }
+                            : d
+                    ));
+                };
+
                 return (
+                    <>
                     <div style={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: 32 }}>
                         {/* Itinerary Details */}
                         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -1233,18 +1501,18 @@
 
                         {days.map(day => (
                             <DaySection key={day.id} title={day.title}>
-                                {day.stops.length > 0 ? (
+                                {day.items.length > 0 ? (
                                     <div
                                         onDragOver={(e) => {
                                             e.preventDefault();
                                             e.dataTransfer.dropEffect = "move";
-                                            const rows = e.currentTarget.querySelectorAll('[data-stop-row]');
+                                            const rows = e.currentTarget.querySelectorAll('[data-item-row]');
                                             const y = e.clientY;
-                                            let idx = day.stops.length;
+                                            let idx = day.items.length;
                                             for (const row of rows) {
                                                 const rect = row.getBoundingClientRect();
                                                 if (y <= rect.top + rect.height / 2) {
-                                                    idx = Number(row.dataset.stopRow);
+                                                    idx = Number(row.dataset.itemRow);
                                                     break;
                                                 }
                                             }
@@ -1253,23 +1521,43 @@
                                         onDrop={(e) => { e.preventDefault(); handleDrop(); }}
                                         style={{ display: "flex", flexDirection: "column", gap: 12 }}
                                     >
-                                        {day.stops.map((name, i) => (
-                                            <React.Fragment key={name}>
+                                        {day.items.map((item, i) => (
+                                            <React.Fragment key={item.id}>
                                                 {showIndicator(day.id, i) && <DropIndicator dayId={day.id} index={i} onDragOver={handleDragOver} onDrop={handleDrop} />}
-                                                <StopRow
-                                                    name={name}
-                                                    dayId={day.id}
-                                                    index={i}
-                                                    isDragging={dragSource?.day === day.id && dragSource?.index === i}
-                                                    justDropped={lastDropped === name}
-                                                    onDragStart={handleDragStart}
-                                                    onDragOver={handleDragOver}
-                                                    onDragEnd={handleDragEnd}
-                                                />
+                                                {item.type === "stop" ? (
+                                                    <StopRow
+                                                        name={item.name}
+                                                        dayId={day.id}
+                                                        index={i}
+                                                        isDragging={dragSource?.day === day.id && dragSource?.index === i}
+                                                        justDropped={lastDropped === item.id}
+                                                        onDragStart={handleDragStart}
+                                                        onDragOver={handleDragOver}
+                                                        onDragEnd={handleDragEnd}
+                                                    />
+                                                ) : (
+                                                    <GroupRow
+                                                        id={item.id}
+                                                        name={item.name}
+                                                        groupType={item.groupType}
+                                                        stops={item.stops}
+                                                        dayId={day.id}
+                                                        index={i}
+                                                        isDragging={dragSource?.day === day.id && dragSource?.index === i}
+                                                        isGroupDragOver={dropTarget?.groupId === item.id}
+                                                        groupDropIndex={dropTarget?.groupId === item.id ? dropTarget.stopIndex : undefined}
+                                                        dragSrc={dragSource}
+                                                        onDragStart={handleDragStart}
+                                                        onDragOver={handleDragOver}
+                                                        onDragEnd={handleDragEnd}
+                                                        onGroupDragOver={(stopIdx) => handleDragOver({ day: day.id, groupId: item.id, stopIndex: stopIdx })}
+                                                        onGroupDrop={handleDrop}
+                                                    />
+                                                )}
                                             </React.Fragment>
                                         ))}
-                                        {showIndicator(day.id, day.stops.length) && <DropIndicator dayId={day.id} index={day.stops.length} onDragOver={handleDragOver} onDrop={handleDrop} />}
-                                        <AddMenu onGroup={onGroup} />
+                                        {showIndicator(day.id, day.items.length) && <DropIndicator dayId={day.id} index={day.items.length} onDragOver={handleDragOver} onDrop={handleDrop} />}
+                                        <AddMenu onGroup={() => handleAddGroup(day.id)} />
                                     </div>
                                 ) : (
                                     <EmptyDropZone
@@ -1285,12 +1573,18 @@
                             </DaySection>
                         ))}
                     </div>
+                    <CreateGroupPanel
+                        open={groupPanelOpen}
+                        onClose={() => setGroupPanelOpen(false)}
+                        onSave={handleGroupCreate}
+                    />
+                    </>
                 );
             }
 
             /* ─── Main ─────────────────────────────────────────────── */
 
-            function Main({ onGroup }) {
+            function Main() {
                 const [activeTab, setActiveTab] = useState("Build");
 
                 return (
@@ -1302,7 +1596,7 @@
                             display: "flex", flexDirection: "column",
                             justifyContent: "flex-start", alignItems: "center",
                         }}>
-                            <ContentFrame onGroup={onGroup} />
+                            <ContentFrame />
                         </div>
                     </div>
                 );
@@ -1312,7 +1606,6 @@
 
             function App() {
                 const [isDark, setIsDark] = useState(false);
-                const [groupPanelOpen, setGroupPanelOpen] = useState(false);
 
                 const toggleDark = useCallback(() => {
                     setIsDark(prev => {
@@ -1332,9 +1625,8 @@
                         <MenuBar onToggleDark={toggleDark} isDark={isDark} />
                         <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
                             <Sidebar />
-                            <Main onGroup={() => setGroupPanelOpen(true)} />
+                            <Main />
                         </div>
-                        <CreateGroupPanel open={groupPanelOpen} onClose={() => setGroupPanelOpen(false)} />
                     </div>
                 );
             }
