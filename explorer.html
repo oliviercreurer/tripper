@@ -321,15 +321,6 @@
             .selection-card:hover {
                 background: var(--color-bg-neutral-subtler);
             }
-            .segment-tab {
-                background: var(--color-bg-secondary);
-                transition: background .15s ease, color .15s ease, border-color .15s ease;
-                cursor: pointer;
-                user-select: none;
-            }
-            .segment-tab:hover:not(.active) {
-                background: var(--color-bg-neutral-subtler);
-            }
             .filter-dropdown {
                 animation: dropdownIn .15s ease;
             }
@@ -478,12 +469,10 @@
                 POI:      { bg: "var(--color-bg-accent-green-subtlest)",  border: "var(--color-bg-accent-green-subtle)",  text: "var(--color-bg-accent-green-bolder)" },
             };
 
-            const CATEGORY_SWATCH = {
-                "Accommodation":       "var(--color-bg-accent-orange-bolder)",
-                "Food & Beverage":     "var(--color-bg-accent-orange-bolder)",
-                "Cultural Attraction": "var(--color-bg-accent-orange-bolder)",
-                "Provincial Park":     "var(--color-bg-accent-green-bolder)",
-                "Retail":              "var(--color-bg-accent-orange-bolder)",
+            /* Map "Provincial Park" type to "Area" for dot colors */
+            const getItemType = (item) => {
+                if (item.category === "Provincial Park") return "Area";
+                return item.type;
             };
 
             /* ─── SVG Icons ───────────────────────────────────────── */
@@ -497,6 +486,8 @@
                     sun: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
                     moon: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>,
                     "circle-x": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>,
+                    "arrow-right": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+                    "arrow-left": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
                 };
                 return icons[name] || null;
             };
@@ -551,49 +542,18 @@
                 );
             }
 
-            /* ─── SegmentTabs ─────────────────────────────────────── */
-            function SegmentTabs({ activeTab, onTabChange, counts }) {
-                const tabs = [
-                    { key: "all",        label: "All items",  count: counts.all },
-                    { key: "businesses", label: "Businesses", count: counts.businesses, swatch: "var(--color-bg-accent-orange-bolder)" },
-                    { key: "pois",       label: "POIs",       count: counts.pois,       swatch: "var(--color-bg-accent-green-bolder)" },
-                ];
-                return (
-                    <div style={{ display: "flex", gap: 8 }}>
-                        {tabs.map(t => {
-                            const isActive = activeTab === t.key;
-                            return (
-                                <div key={t.key} className={`segment-tab ${isActive ? "active" : ""}`}
-                                    onClick={() => onTabChange(t.key)}
-                                    style={{
-                                        display: "flex", alignItems: "center", gap: 0,
-                                        justifyContent: "space-between",
-                                        padding: "8px 16px", borderRadius: 8,
-                                        border: isActive ? "1.5px solid transparent" : "1.5px solid var(--color-border-default)",
-                                        outline: isActive ? "2px solid var(--color-text-default)" : "none",
-                                        outlineOffset: 0,
-                                        background: isActive ? "var(--color-bg-primary)" : "var(--color-bg-secondary)",
-                                        color: "var(--color-text-default)",
-                                        fontSize: 14, fontWeight: 500,
-                                        width: "100%",
-                                    }}>
-                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                        {t.swatch && <div style={{
-                                            width: 10, height: 10, borderRadius: 2,
-                                            background: t.swatch, flexShrink: 0,
-                                        }} />}
-                                        <span>{t.label}</span>
-                                    </div>
-                                    <span style={{
-                                        fontFamily: "'JetBrains Mono', monospace", fontSize: 13,
-                                        opacity: 0.6,
-                                    }}>{t.count}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                );
-            }
+            /* ─── Type dot colors (for legend + row indicators) ──── */
+            const TYPE_DOT = {
+                Business: "#d0a215",
+                POI:      "#8b7ec8",
+                Area:     "#3aa99f",
+            };
+            /* darker variants for map markers/labels in light mode */
+            const TYPE_MAP = {
+                Business: "#a07a0e",
+                POI:      "#6b5da6",
+                Area:     "#2d847c",
+            };
 
             /* ─── FilterBar ───────────────────────────────────────── */
             function FilterBar({ filters, onAddFilter, onRemoveFilter, onUpdateFilter }) {
@@ -740,57 +700,94 @@
             }
 
             /* ─── ResultRow ───────────────────────────────────────── */
-            function ResultRow({ item, index, checked, onToggle }) {
-                const swatch = CATEGORY_SWATCH[item.category] || "var(--color-bg-neutral-bold)";
+            function ResultRow({ item, checked, onToggle, onOpenInfo }) {
+                const dot = TYPE_DOT[getItemType(item)] || TYPE_DOT.Business;
                 return (
                     <div className="result-row" onClick={() => onToggle(item.id)} style={{
-                        display: "flex", alignItems: "center", gap: 12,
-                        padding: "14px 48px", cursor: "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "12px 32px", cursor: "pointer",
                         borderBottom: "1px solid var(--color-border-default)",
                     }}>
-                        <Checkbox checked={checked} onChange={() => onToggle(item.id)} />
-                        <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{item.name}</span>
-                        <span style={{ fontSize: 13, color: "var(--color-text-subtle)", whiteSpace: "nowrap" }}>
-                            {item.category}
-                        </span>
-                        <div style={{
-                            width: 14, height: 14, borderRadius: 3,
-                            background: swatch, flexShrink: 0,
-                        }} />
+                        <div style={{ display: "flex", alignItems: "center", gap: 20, minWidth: 0, flex: "0 1 auto" }}>
+                            <Checkbox checked={checked} onChange={() => onToggle(item.id)} />
+                            <span style={{
+                                fontSize: 14, fontWeight: 600, whiteSpace: "nowrap",
+                                overflow: "hidden", textOverflow: "ellipsis",
+                            }}>{item.name}</span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0, marginLeft: 16 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{
+                                    fontSize: 12, fontWeight: 500,
+                                    color: "var(--color-text-subtlest)", whiteSpace: "nowrap",
+                                }}>{item.category}</span>
+                                <div style={{
+                                    width: 8, height: 8, borderRadius: "50%",
+                                    background: dot, flexShrink: 0,
+                                }} />
+                            </div>
+                            <div onClick={(e) => { e.stopPropagation(); onOpenInfo(item); }} style={{
+                                cursor: "pointer", display: "flex", alignItems: "center",
+                                color: "var(--color-icon-subtle)",
+                                transition: "color .15s ease",
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = "var(--color-icon-normal)"}
+                            onMouseLeave={e => e.currentTarget.style.color = "var(--color-icon-subtle)"}>
+                                <Icon name="arrow-right" size={20} />
+                            </div>
+                        </div>
                     </div>
                 );
             }
 
             /* ─── ResultsList ─────────────────────────────────────── */
-            function ResultsList({ items, selectedIds, onToggle, onSelectAll }) {
+            function ResultsList({ items, selectedIds, onToggle, onSelectAll, onOpenInfo }) {
                 const allChecked = items.length > 0 && items.every(i => selectedIds.has(i.id));
-                const someChecked = items.some(i => selectedIds.has(i.id));
 
                 return (
                     <div style={{ flex: 1, overflow: "auto" }}>
                         {/* Header */}
                         <div style={{
-                            display: "flex", alignItems: "center", gap: 12,
+                            display: "flex", alignItems: "center", justifyContent: "space-between",
                             height: 48,
-                            padding: "10px 48px",
+                            padding: "10px 32px",
                             borderBottom: "1px solid var(--color-border-default)",
+                            borderTop: "1px solid var(--color-border-default)",
                             background: "var(--color-bg-secondary)",
                             position: "sticky", top: 0, zIndex: 2,
                         }}>
-                            <Checkbox checked={allChecked} onChange={() => onSelectAll(!allChecked)} />
-                            <span style={{ flex: 1, fontSize: 13, color: "var(--color-text-subtle)" }}>
-                                Select all
-                            </span>
-                            <span style={{
-                                fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
-                                color: "var(--color-text-subtlest)",
-                            }}>Sort: Name</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                                <Checkbox checked={allChecked} onChange={() => onSelectAll(!allChecked)} />
+                                <span style={{
+                                    fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
+                                    fontWeight: 500, color: "var(--color-text-subtle)",
+                                }}>{items.length} results</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                {[
+                                    { label: "Business", color: TYPE_DOT.Business },
+                                    { label: "POIs",     color: TYPE_DOT.POI },
+                                    { label: "Area",     color: TYPE_DOT.Area },
+                                ].map(legend => (
+                                    <div key={legend.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                        <div style={{
+                                            width: 8, height: 8, borderRadius: "50%",
+                                            background: legend.color, flexShrink: 0,
+                                        }} />
+                                        <span style={{
+                                            fontSize: 12, fontWeight: 500,
+                                            color: "var(--color-text-subtle)",
+                                        }}>{legend.label}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         {/* Rows */}
                         {items.map((item, i) => (
-                            <ResultRow key={item.id} item={item} index={i}
+                            <ResultRow key={item.id} item={item}
                                 checked={selectedIds.has(item.id)}
-                                onToggle={onToggle} />
+                                onToggle={onToggle}
+                                onOpenInfo={onOpenInfo} />
                         ))}
                         {items.length === 0 && (
                             <div style={{
@@ -935,6 +932,89 @@
                 );
             }
 
+            /* ─── StopInfoPanel ─────────────────────────────────── */
+            function StopInfoPanel({ item, isOpen, onClose }) {
+                if (!item) return null;
+                const itemType = getItemType(item);
+                const dot = TYPE_DOT[itemType] || TYPE_DOT.Business;
+                return (
+                    <div style={{
+                        position: "absolute", inset: 0, zIndex: 50,
+                        background: "var(--color-bg-primary)",
+                        overflowY: isOpen ? "auto" : "hidden",
+                        transform: isOpen ? "scale(1)" : "scale(0.96)",
+                        opacity: isOpen ? 1 : 0,
+                        filter: isOpen ? "blur(0)" : "blur(6px)",
+                        transformOrigin: "center bottom",
+                        transition: "transform 300ms cubic-bezier(.2,0,0,1), opacity 300ms cubic-bezier(.2,0,0,1), filter 300ms cubic-bezier(.2,0,0,1)",
+                        willChange: "transform, opacity, filter",
+                        pointerEvents: isOpen ? "auto" : "none",
+                    }}>
+                        <div style={{ padding: "40px 32px 0" }}>
+                            <div onClick={onClose} style={{
+                                display: "inline-flex", alignItems: "center", gap: 4,
+                                height: 32, padding: "0 12px", borderRadius: 8,
+                                background: "var(--color-overlay-blur-bg)",
+                                backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+                                boxShadow: "var(--shadow-overlay)",
+                                cursor: "pointer", fontWeight: 500, fontSize: 14,
+                                color: "var(--color-text-default)", lineHeight: "22px",
+                            }}>
+                                <Icon name="arrow-left" size={16} />
+                                Back
+                            </div>
+                        </div>
+                        <div style={{ padding: "32px 32px 48px", display: "flex", flexDirection: "column", gap: 24 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <div style={{
+                                    width: 10, height: 10, borderRadius: "50%",
+                                    background: dot, flexShrink: 0,
+                                }} />
+                                <span style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-subtle)" }}>
+                                    {itemType}
+                                </span>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                <h2 style={{
+                                    margin: 0, fontFamily: "Outfit", fontWeight: 600,
+                                    fontSize: 24, lineHeight: "32px",
+                                    color: "var(--color-text-default)",
+                                }}>{item.name}</h2>
+                                <p style={{
+                                    margin: 0, fontSize: 14, fontWeight: 500,
+                                    color: "var(--color-text-subtle)", lineHeight: "22px",
+                                }}>{item.category}</p>
+                            </div>
+                            <div style={{
+                                display: "flex", flexDirection: "column", gap: 12,
+                                padding: 20, borderRadius: 12,
+                                background: "var(--color-bg-secondary)",
+                                border: "1px solid var(--color-border-default)",
+                            }}>
+                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <span style={{ fontSize: 13, color: "var(--color-text-subtle)" }}>Region</span>
+                                    <span style={{ fontSize: 13, fontWeight: 500 }}>{item.region}</span>
+                                </div>
+                                {item.tags && item.tags.length > 0 && (
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                        <span style={{ fontSize: 13, color: "var(--color-text-subtle)" }}>Tags</span>
+                                        <span style={{ fontSize: 13, fontWeight: 500 }}>{item.tags.join(", ")}</span>
+                                    </div>
+                                )}
+                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <span style={{ fontSize: 13, color: "var(--color-text-subtle)" }}>Coordinates</span>
+                                    <span style={{
+                                        fontSize: 12, fontWeight: 500,
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                        color: "var(--color-text-subtle)",
+                                    }}>{item.lat.toFixed(4)}, {item.lng.toFixed(4)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
             /* ─── Mapbox token ────────────────────────────────────── */
             const MAPBOX_TOKEN = "pk.eyJ1Ijoib2NyZXVyZXIiLCJhIjoiY2thNWcydHd0MGVieTNncXlhbmx6ajJ2eSJ9.OEcyIWzbV9-kwdpRVqSmLg";
 
@@ -943,8 +1023,8 @@
                 const containerRef = useRef(null);
                 const mapRef = useRef(null);
                 const readyRef = useRef(false);
-                const dataRef = useRef({ items, selectedIds, activeRegions, onToggle });
-                dataRef.current = { items, selectedIds, activeRegions, onToggle };
+                const dataRef = useRef({ items, selectedIds, activeRegions, onToggle, isDark });
+                dataRef.current = { items, selectedIds, activeRegions, onToggle, isDark };
 
                 // initialise map once
                 useEffect(() => {
@@ -1049,15 +1129,16 @@
                         }, "explorer-circles");
 
                         /* populate initial markers from current data */
-                        const { items: itms, selectedIds: sel, activeRegions: ar } = dataRef.current;
+                        const { items: itms, selectedIds: sel, activeRegions: ar, isDark: dk } = dataRef.current;
+                        const mc = dk ? TYPE_DOT : TYPE_MAP;
                         const feats = itms.map(item => ({
                             type: "Feature",
                             geometry: { type: "Point", coordinates: [item.lng, item.lat] },
                             properties: {
                                 id: item.id, name: item.name, category: item.category,
                                 selected: sel.has(item.id),
-                                color: sel.has(item.id) ? "#205EA6" : (item.type === "POI" ? "#66800b" : "#bc5215"),
-                                stroke: sel.has(item.id) ? "#205EA6" : (item.type === "POI" ? "#66800b" : "#bc5215"),
+                                color: sel.has(item.id) ? "#205EA6" : (item.category === "Provincial Park" ? mc.Area : (item.type === "POI" ? mc.POI : mc.Business)),
+                                stroke: sel.has(item.id) ? "#205EA6" : (item.category === "Provincial Park" ? mc.Area : (item.type === "POI" ? mc.POI : mc.Business)),
                             },
                         }));
                         map.getSource("explorer-points").setData({ type: "FeatureCollection", features: feats });
@@ -1114,7 +1195,8 @@
                     if (!map || !readyRef.current) return;
                     const src = map.getSource("explorer-points");
                     if (!src) return;
-                    const { items: itms, selectedIds: sel } = dataRef.current;
+                    const { items: itms, selectedIds: sel, isDark: dk } = dataRef.current;
+                    const mc = dk ? TYPE_DOT : TYPE_MAP;
                     const features = itms.map(item => {
                         const isSel = sel.has(item.id);
                         return {
@@ -1125,8 +1207,8 @@
                                 name: item.name,
                                 category: item.category,
                                 selected: isSel,
-                                color: isSel ? "#205EA6" : (item.type === "POI" ? "#66800b" : "#bc5215"),
-                                stroke: isSel ? "#205EA6" : (item.type === "POI" ? "#66800b" : "#bc5215"),
+                                color: isSel ? "#205EA6" : (item.category === "Provincial Park" ? mc.Area : (item.type === "POI" ? mc.POI : mc.Business)),
+                                stroke: isSel ? "#205EA6" : (item.category === "Provincial Park" ? mc.Area : (item.type === "POI" ? mc.POI : mc.Business)),
                             },
                         };
                     });
@@ -1216,10 +1298,10 @@
             function App() {
                 const [isDark, setIsDark] = useState(false);
                 const [searchQuery, setSearchQuery] = useState("");
-                const [activeTab, setActiveTab] = useState("all");
                 const [filters, setFilters] = useState([]);
                 const [selectedIds, setSelectedIds] = useState(new Set());
                 const [cartExpanded, setCartExpanded] = useState(false);
+                const [openInfoItem, setOpenInfoItem] = useState(null);
 
                 const toggleDark = useCallback(() => {
                     setIsDark(prev => {
@@ -1232,10 +1314,6 @@
                 /* filtering pipeline */
                 const filteredItems = useMemo(() => {
                     let result = [...ITEMS];
-
-                    // tab filter
-                    if (activeTab === "businesses") result = result.filter(i => i.type === "Business");
-                    if (activeTab === "pois") result = result.filter(i => i.type === "POI");
 
                     // active filters
                     for (const f of filters) {
@@ -1257,29 +1335,6 @@
                     // sort by name
                     result.sort((a, b) => a.name.localeCompare(b.name));
                     return result;
-                }, [activeTab, filters, searchQuery]);
-
-                /* counts for segment tabs */
-                const counts = useMemo(() => {
-                    let base = [...ITEMS];
-                    for (const f of filters) {
-                        if (f.values.length === 0) continue;
-                        if (f.field === "Region") base = base.filter(i => f.values.includes(i.region));
-                        if (f.field === "Category") base = base.filter(i => f.values.includes(i.category));
-                        if (f.field === "Custom Tag") base = base.filter(i => i.tags.some(t => f.values.includes(t)));
-                    }
-                    if (searchQuery.trim()) {
-                        const q = searchQuery.toLowerCase();
-                        base = base.filter(i =>
-                            i.name.toLowerCase().includes(q) ||
-                            i.category.toLowerCase().includes(q)
-                        );
-                    }
-                    return {
-                        all: base.length,
-                        businesses: base.filter(i => i.type === "Business").length,
-                        pois: base.filter(i => i.type === "POI").length,
-                    };
                 }, [filters, searchQuery]);
 
                 const toggleItem = useCallback((id) => {
@@ -1340,32 +1395,31 @@
                             position: "relative", borderLeft: "1px solid var(--color-border-default)",
                         }}>
                             {/* Header */}
-                            <div style={{ padding: "64px 48px 24px", borderBottom: "1px solid var(--color-border-default)" }}>
-                                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                                    <h1 style={{
-                                        fontFamily: "Outfit", fontSize: 24, fontWeight: 600,
-                                        lineHeight: 1.2, margin: 0,
-                                    }}>Explorer</h1>
-                                    <button onClick={toggleDark} style={{
-                                        background: "none", border: "none", cursor: "pointer",
-                                        padding: 6, borderRadius: 8, color: "var(--color-icon-subtle)",
-                                        display: "flex", alignItems: "center", justifyContent: "center",
+                            <div style={{ padding: "40px 32px 24px" }}>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                                        <h1 style={{
+                                            fontFamily: "Outfit", fontSize: 18, fontWeight: 600,
+                                            lineHeight: "24px", margin: 0,
+                                        }}>Explorer</h1>
+                                        <button onClick={toggleDark} style={{
+                                            background: "none", border: "none", cursor: "pointer",
+                                            padding: 6, borderRadius: 8, color: "var(--color-icon-subtle)",
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                        }}>
+                                            <Icon name={isDark ? "sun" : "moon"} size={18} />
+                                        </button>
+                                    </div>
+                                    <p style={{
+                                        fontSize: 16, color: "var(--color-text-subtle)",
+                                        lineHeight: "24px", margin: 0,
                                     }}>
-                                        <Icon name={isDark ? "sun" : "moon"} size={18} />
-                                    </button>
+                                        Search within your account or across Whereabouts' extensive database of
+                                        tourism businesses, organizations, and points of interest.
+                                    </p>
                                 </div>
-                                <p style={{
-                                    fontSize: 14, color: "var(--color-text-subtle)",
-                                    lineHeight: 1.5, margin: "8px 0 20px",
-                                }}>
-                                    Search within your account or across Whereabouts' extensive database of
-                                    tourism businesses, organizations, and points of interest.
-                                </p>
-                                <SearchBar value={searchQuery} onChange={setSearchQuery} />
-                                <div style={{ marginTop: 16 }}>
-                                    <SegmentTabs activeTab={activeTab} onTabChange={setActiveTab} counts={counts} />
-                                </div>
-                                <div style={{ marginTop: 12, marginBottom: 8 }}>
+                                <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+                                    <SearchBar value={searchQuery} onChange={setSearchQuery} />
                                     <FilterBar
                                         filters={filters}
                                         onAddFilter={addFilter}
@@ -1381,6 +1435,23 @@
                                 selectedIds={selectedIds}
                                 onToggle={toggleItem}
                                 onSelectAll={selectAll}
+                                onOpenInfo={setOpenInfoItem}
+                            />
+
+                            {/* Dim scrim behind info panel */}
+                            <div onClick={() => setOpenInfoItem(null)} style={{
+                                position: "absolute", inset: 0, zIndex: 49,
+                                background: "var(--color-overlay-scrim)",
+                                opacity: openInfoItem ? 1 : 0,
+                                pointerEvents: openInfoItem ? "auto" : "none",
+                                transition: "opacity 200ms ease",
+                            }} />
+
+                            {/* Stop info panel */}
+                            <StopInfoPanel
+                                item={openInfoItem}
+                                isOpen={!!openInfoItem}
+                                onClose={() => setOpenInfoItem(null)}
                             />
                         </div>
 
