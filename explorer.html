@@ -4,6 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Explorer</title>
+        <link href="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.css" rel="stylesheet" />
+        <script src="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -221,10 +223,94 @@
             .filter-pill:hover {
                 border-color: var(--color-border-bold);
             }
-            .selection-tray {
+            /* ─── Floating cart overlay ─────────────────────────── */
+            .cart-scrim {
+                position: absolute;
+                inset: 0;
+                background: var(--color-bg-primary);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .3s ease;
+                z-index: 19;
+            }
+            .cart-scrim.active {
+                opacity: .55;
+                pointer-events: auto;
+            }
+            .cart-overlay {
+                position: absolute;
+                bottom: 64px; left: 50%;
+                transform: translateX(-50%);
+                width: 764px;
+                max-width: 90%;
+                z-index: 20;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                pointer-events: none;
+                transition: opacity .3s ease;
+            }
+            .cart-overlay > * {
+                pointer-events: auto;
+            }
+            /* ─ Drawer (narrower than bar, 16px inset each side) ─ */
+            .cart-drawer {
+                width: calc(100% - 32px);
+                overflow: hidden;
+                transition: max-height .25s cubic-bezier(.4, 0, .2, 1),
+                            opacity .2s ease;
+            }
+            .cart-drawer.closed {
+                max-height: 0;
+                opacity: 0;
+            }
+            .cart-drawer.open {
+                max-height: calc(100vh - 64px - 64px - 80px);
+                opacity: 1;
+            }
+            .cart-card {
+                background: var(--color-bg-primary);
+                border: 1px solid var(--color-border-default);
+                border-radius: 16px 16px 0 0;
+                box-shadow: 0 2px 20px rgba(0,0,0,.04);
+                padding: 24px 24px 32px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .cart-inner {
+                background: var(--color-bg-secondary);
+                border: 1px solid var(--color-border-default);
+                border-radius: 12px;
+                overflow: hidden;
+            }
+            .cart-card-scroll {
+                max-height: calc(100vh - 64px - 64px - 200px);
+                overflow-y: auto;
+            }
+            .cart-item {
+                display: flex; align-items: center; gap: 32px;
+                padding: 16px 20px;
+                border-bottom: 1px solid var(--color-border-default);
+            }
+            .cart-item:last-child {
+                border-bottom: none;
+            }
+            .cart-item:hover {
+                background: var(--color-bg-neutral-subtler);
+            }
+            @keyframes cartItemIn {
+                from { opacity: 0; transform: translateY(12px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+            /* ─ Blue bar ─ */
+            .cart-bar {
+                background: var(--color-bg-selected-bold);
+                border-radius: 16px;
+                width: 100%;
                 transition: transform .3s cubic-bezier(.4, 0, .2, 1), opacity .3s ease;
             }
-            .selection-tray.hidden {
+            .cart-bar.hidden {
                 transform: translateY(100%);
                 opacity: 0;
                 pointer-events: none;
@@ -236,6 +322,7 @@
                 background: var(--color-bg-neutral-subtler);
             }
             .segment-tab {
+                background: var(--color-bg-secondary);
                 transition: background .15s ease, color .15s ease, border-color .15s ease;
                 cursor: pointer;
                 user-select: none;
@@ -249,18 +336,6 @@
             @keyframes dropdownIn {
                 from { opacity: 0; transform: translateY(-4px); }
                 to   { opacity: 1; transform: translateY(0); }
-            }
-            .review-panel {
-                transition: max-height .3s cubic-bezier(.4, 0, .2, 1), opacity .2s ease;
-                overflow: hidden;
-            }
-            .review-panel.collapsed {
-                max-height: 0;
-                opacity: 0;
-            }
-            .review-panel.expanded {
-                max-height: 400px;
-                opacity: 1;
             }
         </style>
     </head>
@@ -290,29 +365,106 @@
 
             /* ─── Dummy data ──────────────────────────────────────── */
             const ITEMS = [
-                { id: 1,  name: "Atmosphere Bikes",            category: "Accommodation",       type: "Business", region: "Montreal",  tags: ["Southside"] },
-                { id: 2,  name: "Cardinal Café",               category: "Food & Beverage",     type: "Business", region: "Montreal",  tags: ["Southside"] },
-                { id: 3,  name: "Montreal Museum of Fine Arts", category: "Cultural Attraction", type: "POI",      region: "Montreal",  tags: [] },
-                { id: 4,  name: "Dunya",                       category: "Food & Beverage",     type: "Business", region: "Montreal",  tags: ["Downtown"] },
-                { id: 5,  name: "Java Café",                   category: "Accommodation",       type: "Business", region: "Montreal",  tags: [] },
-                { id: 6,  name: "Billy's Diner",               category: "Food & Beverage",     type: "Business", region: "Ottawa",    tags: ["Byward"] },
-                { id: 7,  name: "Blue Ridge Cottages",          category: "Accommodation",       type: "POI",      region: "Ottawa",    tags: [] },
-                { id: 8,  name: "Sweet's Candy Shop",          category: "Retail",              type: "Business", region: "Ottawa",    tags: ["Byward"] },
-                { id: 9,  name: "The Lonesome Rose",           category: "Food & Beverage",     type: "Business", region: "Montreal",  tags: ["Southside"] },
-                { id: 10, name: "Parsons Provincial Park",     category: "Provincial Park",     type: "POI",      region: "Ottawa",    tags: [] },
-                { id: 11, name: "Fin & Feather",               category: "Retail",              type: "POI",      region: "Montreal",  tags: [] },
-                { id: 12, name: "Le Plateau Bistro",           category: "Food & Beverage",     type: "Business", region: "Montreal",  tags: ["Downtown"] },
-                { id: 13, name: "Rideau Canal Locks",          category: "Cultural Attraction", type: "POI",      region: "Ottawa",    tags: [] },
-                { id: 14, name: "Maple Grove Inn",             category: "Accommodation",       type: "Business", region: "Ottawa",    tags: [] },
-                { id: 15, name: "Chez Laurent",                category: "Food & Beverage",     type: "Business", region: "Montreal",  tags: ["Downtown", "Southside"] },
-                { id: 16, name: "Parliament Hill",             category: "Cultural Attraction", type: "POI",      region: "Ottawa",    tags: [] },
-                { id: 17, name: "Gatineau Hot Springs",        category: "Accommodation",       type: "Business", region: "Ottawa",    tags: [] },
-                { id: 18, name: "The Night Owl Pub",           category: "Food & Beverage",     type: "Business", region: "Montreal",  tags: ["Southside"] },
-                { id: 19, name: "Byward Market Flowers",       category: "Retail",              type: "Business", region: "Ottawa",    tags: ["Byward"] },
-                { id: 20, name: "Mont Royal Lookout",          category: "Provincial Park",     type: "POI",      region: "Montreal",  tags: [] },
-                { id: 21, name: "La Cabane à Sucre",           category: "Food & Beverage",     type: "Business", region: "Montreal",  tags: [] },
-                { id: 22, name: "Champlain Bridge Viewpoint",  category: "Cultural Attraction", type: "POI",      region: "Montreal",  tags: [] },
+                // ── Montreal: Downtown / Ville-Marie ──
+                { id: 1,  name: "Montreal Museum of Fine Arts",  category: "Cultural Attraction", type: "POI",      region: "Downtown",    tags: ["Museum"],       lat: 45.4985, lng: -73.5793 },
+                { id: 2,  name: "Place des Arts",                category: "Cultural Attraction", type: "POI",      region: "Downtown",    tags: ["Arts"],         lat: 45.5081, lng: -73.5664 },
+                { id: 3,  name: "McCord Stewart Museum",         category: "Cultural Attraction", type: "POI",      region: "Downtown",    tags: ["Museum"],       lat: 45.5040, lng: -73.5736 },
+                { id: 4,  name: "Basilique Notre-Dame",          category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Historic"],    lat: 45.5046, lng: -73.5566 },
+                { id: 5,  name: "Bonsecours Market",             category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Historic"],    lat: 45.5087, lng: -73.5520 },
+                { id: 6,  name: "Cardinal Café",                 category: "Food & Beverage",     type: "Business", region: "Downtown",    tags: ["Coffee"],       lat: 45.5025, lng: -73.5717 },
+                { id: 7,  name: "Dunya",                         category: "Food & Beverage",     type: "Business", region: "Downtown",    tags: ["Middle Eastern"], lat: 45.5063, lng: -73.5680 },
+                { id: 8,  name: "Chez Laurent",                  category: "Food & Beverage",     type: "Business", region: "Downtown",    tags: ["French"],       lat: 45.5010, lng: -73.5759 },
+                { id: 9,  name: "Maison Boulud",                 category: "Food & Beverage",     type: "Business", region: "Downtown",    tags: ["Fine Dining"],  lat: 45.5005, lng: -73.5729 },
+                { id: 10, name: "Hôtel Birks",                   category: "Accommodation",       type: "Business", region: "Downtown",    tags: ["Luxury"],       lat: 45.5020, lng: -73.5735 },
+                // ── Plateau Mont-Royal ──
+                { id: 11, name: "Le Plateau Bistro",             category: "Food & Beverage",     type: "Business", region: "Plateau",     tags: ["Brunch"],       lat: 45.5225, lng: -73.5776 },
+                { id: 12, name: "Schwartz's Deli",               category: "Food & Beverage",     type: "Business", region: "Plateau",     tags: ["Iconic"],       lat: 45.5189, lng: -73.5774 },
+                { id: 13, name: "Beauty's Luncheonette",         category: "Food & Beverage",     type: "Business", region: "Plateau",     tags: ["Brunch"],       lat: 45.5208, lng: -73.5850 },
+                { id: 14, name: "Librairie Drawn & Quarterly",   category: "Retail",              type: "Business", region: "Plateau",     tags: ["Books"],        lat: 45.5256, lng: -73.5851 },
+                { id: 15, name: "Parc La Fontaine",              category: "Provincial Park",     type: "POI",      region: "Plateau",     tags: ["Park"],         lat: 45.5283, lng: -73.5689 },
+                { id: 16, name: "Tam-Tams du Mont Royal",        category: "Cultural Attraction", type: "POI",      region: "Plateau",     tags: ["Music"],        lat: 45.5155, lng: -73.5878 },
+                // ── Mile End / Mile-Ex ──
+                { id: 17, name: "Fairmount Bagel",               category: "Food & Beverage",     type: "Business", region: "Mile End",    tags: ["Iconic"],       lat: 45.5244, lng: -73.5974 },
+                { id: 18, name: "St-Viateur Bagel",              category: "Food & Beverage",     type: "Business", region: "Mile End",    tags: ["Iconic"],       lat: 45.5233, lng: -73.6012 },
+                { id: 19, name: "Dieu du Ciel!",                 category: "Food & Beverage",     type: "Business", region: "Mile End",    tags: ["Brewery"],      lat: 45.5275, lng: -73.5976 },
+                { id: 20, name: "Marché Jean-Talon",             category: "Retail",              type: "POI",      region: "Mile End",    tags: ["Market"],       lat: 45.5372, lng: -73.6146 },
+                { id: 21, name: "Club Social",                   category: "Food & Beverage",     type: "Business", region: "Mile End",    tags: ["Coffee"],       lat: 45.5213, lng: -73.5979 },
+                // ── Old Montreal ──
+                { id: 22, name: "Science Centre",                category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Museum"],      lat: 45.5055, lng: -73.5523 },
+                { id: 23, name: "Clock Tower",                   category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Historic"],    lat: 45.5104, lng: -73.5464 },
+                { id: 24, name: "Old Port Skating Rink",         category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Sports"],      lat: 45.5048, lng: -73.5539 },
+                { id: 25, name: "Olive et Gourmando",            category: "Food & Beverage",     type: "Business", region: "Old Montreal", tags: ["Brunch"],      lat: 45.5030, lng: -73.5568 },
+                { id: 26, name: "Le Petit Dep",                  category: "Food & Beverage",     type: "Business", region: "Old Montreal", tags: ["Coffee"],      lat: 45.5041, lng: -73.5541 },
+                { id: 27, name: "Auberge du Vieux-Port",         category: "Accommodation",       type: "Business", region: "Old Montreal", tags: ["Boutique"],    lat: 45.5068, lng: -73.5505 },
+                // ── Griffintown / Saint-Henri ──
+                { id: 28, name: "Joe Beef",                      category: "Food & Beverage",     type: "Business", region: "Griffintown",  tags: ["Fine Dining"], lat: 45.4830, lng: -73.5784 },
+                { id: 29, name: "Atwater Market",                category: "Retail",              type: "POI",      region: "Griffintown",  tags: ["Market"],      lat: 45.4829, lng: -73.5845 },
+                { id: 30, name: "Lachine Canal Path",            category: "Provincial Park",     type: "POI",      region: "Griffintown",  tags: ["Cycling"],     lat: 45.4815, lng: -73.5735 },
+                { id: 31, name: "Canal Lounge",                  category: "Food & Beverage",     type: "Business", region: "Griffintown",  tags: ["Bar"],         lat: 45.4870, lng: -73.5677 },
+                { id: 32, name: "Rustique Pie Kitchen",          category: "Food & Beverage",     type: "Business", region: "Griffintown",  tags: ["Bakery"],      lat: 45.4847, lng: -73.5712 },
+                // ── Mont Royal / Outremont ──
+                { id: 33, name: "Mont Royal Summit",             category: "Provincial Park",     type: "POI",      region: "Mont Royal",   tags: ["Park", "Hiking"], lat: 45.5045, lng: -73.5878 },
+                { id: 34, name: "Beaver Lake",                   category: "Provincial Park",     type: "POI",      region: "Mont Royal",   tags: ["Park"],        lat: 45.4993, lng: -73.5962 },
+                { id: 35, name: "Smith House",                   category: "Cultural Attraction", type: "POI",      region: "Mont Royal",   tags: ["Historic"],    lat: 45.5036, lng: -73.5896 },
+                { id: 36, name: "Oratoire Saint-Joseph",         category: "Cultural Attraction", type: "POI",      region: "Mont Royal",   tags: ["Historic"],    lat: 45.4917, lng: -73.6170 },
+                { id: 37, name: "Leméac",                        category: "Food & Beverage",     type: "Business", region: "Mont Royal",   tags: ["French"],      lat: 45.5167, lng: -73.6070 },
+                // ── Hochelaga / East End ──
+                { id: 38, name: "Jardin Botanique",              category: "Provincial Park",     type: "POI",      region: "Hochelaga",    tags: ["Park"],        lat: 45.5576, lng: -73.5625 },
+                { id: 39, name: "Biodome",                       category: "Cultural Attraction", type: "POI",      region: "Hochelaga",    tags: ["Museum"],      lat: 45.5599, lng: -73.5508 },
+                { id: 40, name: "Olympic Stadium",               category: "Cultural Attraction", type: "POI",      region: "Hochelaga",    tags: ["Sports", "Iconic"], lat: 45.5579, lng: -73.5516 },
+                { id: 41, name: "Insectarium",                   category: "Cultural Attraction", type: "POI",      region: "Hochelaga",    tags: ["Museum"],      lat: 45.5568, lng: -73.5587 },
+                { id: 42, name: "Café Dispatch",                 category: "Food & Beverage",     type: "Business", region: "Hochelaga",    tags: ["Coffee"],      lat: 45.5415, lng: -73.5450 },
+                // ── Verdun / South Shore ──
+                { id: 43, name: "Verdun Beach",                  category: "Provincial Park",     type: "POI",      region: "Verdun",       tags: ["Park"],        lat: 45.4600, lng: -73.5670 },
+                { id: 44, name: "Wellington Street Shops",        category: "Retail",              type: "Business", region: "Verdun",       tags: ["Shopping"],    lat: 45.4590, lng: -73.5720 },
+                { id: 45, name: "Palco",                         category: "Food & Beverage",     type: "Business", region: "Verdun",       tags: ["Bar"],         lat: 45.4596, lng: -73.5694 },
+                // ── Rosemont / Petite-Patrie ──
+                { id: 46, name: "Marché de la Petite-Patrie",    category: "Retail",              type: "POI",      region: "Rosemont",     tags: ["Market"],      lat: 45.5345, lng: -73.6050 },
+                { id: 47, name: "Hôtel Le Germain",              category: "Accommodation",       type: "Business", region: "Downtown",     tags: ["Boutique"],    lat: 45.5015, lng: -73.5700 },
+                { id: 48, name: "Auberge Bishop",                category: "Accommodation",       type: "Business", region: "Downtown",     tags: ["Budget"],      lat: 45.4980, lng: -73.5730 },
+                { id: 49, name: "Gîte du Plateau",               category: "Accommodation",       type: "Business", region: "Plateau",      tags: ["B&B"],         lat: 45.5240, lng: -73.5815 },
+                { id: 50, name: "La Pêche Fraîche",              category: "Food & Beverage",     type: "Business", region: "Rosemont",     tags: ["Seafood"],     lat: 45.5380, lng: -73.5920 },
             ];
+
+            /* ─── Region boundaries (closed polygons, [lng, lat]) ── */
+            const REGION_BOUNDARIES = {
+                "Downtown": [
+                    [-73.5830, 45.5100], [-73.5830, 45.4960], [-73.5620, 45.4960],
+                    [-73.5620, 45.5100], [-73.5830, 45.5100],
+                ],
+                "Old Montreal": [
+                    [-73.5600, 45.5110], [-73.5600, 45.5015], [-73.5430, 45.5015],
+                    [-73.5430, 45.5110], [-73.5600, 45.5110],
+                ],
+                "Plateau": [
+                    [-73.5910, 45.5310], [-73.5910, 45.5140], [-73.5650, 45.5140],
+                    [-73.5650, 45.5310], [-73.5910, 45.5310],
+                ],
+                "Mile End": [
+                    [-73.6180, 45.5400], [-73.6180, 45.5200], [-73.5930, 45.5200],
+                    [-73.5930, 45.5400], [-73.6180, 45.5400],
+                ],
+                "Griffintown": [
+                    [-73.5880, 45.4900], [-73.5880, 45.4790], [-73.5640, 45.4790],
+                    [-73.5640, 45.4900], [-73.5880, 45.4900],
+                ],
+                "Mont Royal": [
+                    [-73.6210, 45.5080], [-73.6210, 45.4880], [-73.5830, 45.4880],
+                    [-73.5830, 45.5080], [-73.6210, 45.5080],
+                ],
+                "Hochelaga": [
+                    [-73.5650, 45.5620], [-73.5650, 45.5380], [-73.5400, 45.5380],
+                    [-73.5400, 45.5620], [-73.5650, 45.5620],
+                ],
+                "Verdun": [
+                    [-73.5770, 45.4650], [-73.5770, 45.4550], [-73.5620, 45.4550],
+                    [-73.5620, 45.4650], [-73.5770, 45.4650],
+                ],
+                "Rosemont": [
+                    [-73.6100, 45.5420], [-73.6100, 45.5300], [-73.5870, 45.5300],
+                    [-73.5870, 45.5420], [-73.6100, 45.5420],
+                ],
+            };
 
             const FILTER_OPTIONS = {
                 "Region":        [...new Set(ITEMS.map(i => i.region))],
@@ -344,6 +496,7 @@
                     check: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
                     sun: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
                     moon: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>,
+                    "circle-x": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>,
                 };
                 return icons[name] || null;
             };
@@ -369,9 +522,10 @@
                 return (
                     <div style={{
                         display: "flex", alignItems: "center", gap: 8,
-                        border: "1.5px solid var(--color-border-selected)",
-                        borderRadius: 24, padding: "10px 16px",
-                        background: "var(--color-bg-primary)",
+                        border: "2px solid var(--color-border-selected)",
+                        borderImage: "none",
+                        borderRadius: 8, padding: "10px 16px",
+                        background: "var(--color-bg-secondary)",
                     }}>
                         <input
                             type="text"
@@ -412,21 +566,27 @@
                                 <div key={t.key} className={`segment-tab ${isActive ? "active" : ""}`}
                                     onClick={() => onTabChange(t.key)}
                                     style={{
-                                        display: "flex", alignItems: "center", gap: 8,
+                                        display: "flex", alignItems: "center", gap: 0,
+                                        justifyContent: "space-between",
                                         padding: "8px 16px", borderRadius: 8,
-                                        border: isActive ? "1.5px solid var(--color-border-selected)" : "1.5px solid var(--color-border-default)",
-                                        background: isActive ? "var(--color-bg-selected-bold)" : "var(--color-bg-primary)",
-                                        color: isActive ? "var(--color-text-inverse)" : "var(--color-text-default)",
+                                        border: isActive ? "1.5px solid transparent" : "1.5px solid var(--color-border-default)",
+                                        outline: isActive ? "2px solid var(--color-text-default)" : "none",
+                                        outlineOffset: 0,
+                                        background: isActive ? "var(--color-bg-primary)" : "var(--color-bg-secondary)",
+                                        color: "var(--color-text-default)",
                                         fontSize: 14, fontWeight: 500,
+                                        width: "100%",
                                     }}>
-                                    {t.swatch && !isActive && <div style={{
-                                        width: 10, height: 10, borderRadius: 2,
-                                        background: t.swatch, flexShrink: 0,
-                                    }} />}
-                                    <span>{t.label}</span>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                        {t.swatch && <div style={{
+                                            width: 10, height: 10, borderRadius: 2,
+                                            background: t.swatch, flexShrink: 0,
+                                        }} />}
+                                        <span>{t.label}</span>
+                                    </div>
                                     <span style={{
                                         fontFamily: "'JetBrains Mono', monospace", fontSize: 13,
-                                        opacity: isActive ? 0.8 : 0.6,
+                                        opacity: 0.6,
                                     }}>{t.count}</span>
                                 </div>
                             );
@@ -463,7 +623,7 @@
                         <div ref={addRef} style={{ position: "relative" }}>
                             <button onClick={() => setShowAddMenu(!showAddMenu)} style={{
                                 display: "flex", alignItems: "center", gap: 4,
-                                padding: "6px 12px", borderRadius: 20,
+                                padding: "6px 12px", borderRadius: 8,
                                 border: "1.5px solid var(--color-border-default)",
                                 background: "var(--color-bg-primary)", cursor: "pointer",
                                 fontSize: 13, fontWeight: 500, color: "var(--color-text-default)",
@@ -525,7 +685,7 @@
                     <div ref={ref} style={{ position: "relative" }}>
                         <div className="filter-pill" onClick={() => setOpen(!open)} style={{
                             display: "flex", alignItems: "center", gap: 4,
-                            padding: "6px 10px 6px 12px", borderRadius: 20,
+                            padding: "6px 10px 6px 12px", borderRadius: 8,
                             border: "1.5px solid var(--color-bg-accent-blue-subtle)",
                             background: "var(--color-bg-accent-blue-subtlest)",
                             cursor: "pointer", fontSize: 13, fontWeight: 500,
@@ -585,7 +745,7 @@
                 return (
                     <div className="result-row" onClick={() => onToggle(item.id)} style={{
                         display: "flex", alignItems: "center", gap: 12,
-                        padding: "14px 16px", cursor: "pointer",
+                        padding: "14px 48px", cursor: "pointer",
                         borderBottom: "1px solid var(--color-border-default)",
                     }}>
                         <Checkbox checked={checked} onChange={() => onToggle(item.id)} />
@@ -597,10 +757,6 @@
                             width: 14, height: 14, borderRadius: 3,
                             background: swatch, flexShrink: 0,
                         }} />
-                        <span style={{
-                            fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
-                            color: "var(--color-text-subtlest)", width: 20, textAlign: "right",
-                        }}>{index + 1}</span>
                     </div>
                 );
             }
@@ -615,7 +771,8 @@
                         {/* Header */}
                         <div style={{
                             display: "flex", alignItems: "center", gap: 12,
-                            padding: "10px 16px",
+                            height: 48,
+                            padding: "10px 48px",
                             borderBottom: "1px solid var(--color-border-default)",
                             background: "var(--color-bg-secondary)",
                             position: "sticky", top: 0, zIndex: 2,
@@ -660,104 +817,398 @@
                 );
             }
 
-            /* ─── SelectionTray ───────────────────────────────────── */
-            function SelectionTray({ selectedItems, onRemove, onClearAll }) {
-                const [expanded, setExpanded] = useState(false);
+            /* ─── Cart (floating overlay) ─────────────────────────── */
+            function Cart({ selectedItems, onRemove, expanded, setExpanded }) {
+                const scrollRef = useRef(null);
                 const count = selectedItems.length;
 
-                if (count === 0) return null;
+                // collapse when all items removed
+                useEffect(() => {
+                    if (count === 0) setExpanded(false);
+                }, [count]);
+
+                // scroll to bottom when items added
+                useEffect(() => {
+                    const el = scrollRef.current;
+                    if (el && expanded) {
+                        el.scrollTop = el.scrollHeight;
+                    }
+                }, [count, expanded]);
 
                 return (
-                    <div className={`selection-tray ${count === 0 ? "hidden" : ""}`} style={{
-                        position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 10,
-                        background: "var(--color-bg-secondary)",
-                        borderTop: "1px solid var(--color-border-default)",
+                    <div className="cart-overlay" style={{
+                        opacity: count > 0 ? 1 : 0,
+                        pointerEvents: count > 0 ? "auto" : "none",
                     }}>
-                        {/* Review panel */}
-                        <div className={`review-panel ${expanded ? "expanded" : "collapsed"}`}>
-                            <div style={{
-                                maxHeight: 360, overflowY: "auto", padding: "12px 20px",
-                            }}>
-                                {selectedItems.map(item => (
-                                    <div key={item.id} className="selection-card" style={{
-                                        display: "flex", alignItems: "center", gap: 12,
-                                        padding: "12px 14px",
-                                        borderBottom: "1px solid var(--color-border-default)",
-                                        borderLeft: "3px solid var(--color-border-default)",
-                                        background: "var(--color-bg-primary)",
-                                        marginBottom: 1,
-                                    }}>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontSize: 14, fontWeight: 600 }}>{item.name}</div>
-                                            <div style={{ fontSize: 12, color: "var(--color-text-subtle)", marginTop: 2 }}>
-                                                {item.category}
-                                            </div>
-                                        </div>
-                                        <TypeBadge type={item.type} />
-                                        <div onClick={() => onRemove(item.id)} style={{
-                                            cursor: "pointer", padding: 4, borderRadius: 99,
-                                            display: "flex", alignItems: "center", justifyContent: "center",
-                                            color: "var(--color-icon-subtle)",
-                                            transition: "color .15s ease",
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.color = "var(--color-text-default)"}
-                                        onMouseLeave={e => e.currentTarget.style.color = "var(--color-icon-subtle)"}>
-                                            <Icon name="x" size={16} />
-                                        </div>
+                        {/* Drawer — narrower than the bar, animates open/closed */}
+                        <div className={`cart-drawer ${expanded && count > 0 ? "open" : "closed"}`}>
+                            <div className="cart-card">
+                                <div style={{
+                                    fontSize: 14, fontWeight: 500,
+                                    color: "var(--color-text-default)",
+                                }}>
+                                    Items ({count})
+                                </div>
+                                <div className="cart-inner">
+                                    <div className="cart-card-scroll" ref={scrollRef}>
+                                        {selectedItems.map((item, i) => {
+                                            const c = TYPE_COLORS[item.type] || TYPE_COLORS.Business;
+                                            return (
+                                                <div key={item.id} className="cart-item"
+                                                    style={{ animation: "cartItemIn .25s cubic-bezier(.4,0,.2,1) both",
+                                                             animationDelay: `${Math.min(i * 0.03, 0.3)}s` }}>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <div style={{ fontSize: 14, fontWeight: 600 }}>{item.name}</div>
+                                                    </div>
+                                                    <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                                                        <span style={{
+                                                            fontSize: 12, fontWeight: 500,
+                                                            color: "var(--color-text-subtlest)",
+                                                        }}>{item.category}</span>
+                                                        <div style={{
+                                                            width: 32, display: "flex",
+                                                            alignItems: "center", justifyContent: "center",
+                                                        }}>
+                                                            <div style={{
+                                                                width: 12, height: 12, borderRadius: 2,
+                                                                background: c.border,
+                                                                border: `1px solid ${c.text}`,
+                                                            }} />
+                                                        </div>
+                                                        <div onClick={() => onRemove(item.id)} style={{
+                                                            cursor: "pointer", display: "flex",
+                                                            alignItems: "center", justifyContent: "center",
+                                                            color: "var(--color-text-default)",
+                                                            transition: "opacity .15s ease",
+                                                        }}
+                                                        onMouseEnter={e => e.currentTarget.style.opacity = ".5"}
+                                                        onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
+                                                            <Icon name="circle-x" size={16} />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
-                                ))}
+                                </div>
                             </div>
                         </div>
 
-                        {/* Bottom bar */}
-                        <div style={{
-                            display: "flex", alignItems: "center", gap: 12,
-                            padding: "14px 20px",
-                            background: "var(--color-bg-selected-bold)",
-                            borderRadius: "0",
+                        {/* Blue bottom bar — full width */}
+                        <div className={`cart-bar ${count === 0 ? "hidden" : ""}`} style={{
+                            display: "flex", alignItems: "center", justifyContent: "space-between",
+                            padding: 16,
                         }}>
-                            <div style={{
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                background: "var(--color-bg-accent-blue-subtle)",
-                                color: "#FFFDF6", fontWeight: 600,
-                                fontSize: 13, borderRadius: 6, minWidth: 28, height: 28,
-                                padding: "0 6px",
-                            }}>{count}</div>
-                            <span style={{ fontSize: 14, fontWeight: 500, color: "#FFFDF6" }}>
-                                items selected
-                            </span>
-                            <div style={{ flex: 1 }} />
-                            <button onClick={() => setExpanded(!expanded)} style={{
-                                padding: "8px 20px", borderRadius: 20,
-                                border: "1.5px solid rgba(255,255,255,.3)",
-                                background: "transparent", cursor: "pointer",
-                                fontSize: 13, fontWeight: 500, color: "#FFFDF6",
-                            }}>
-                                {expanded ? "Collapse" : "Review"}
-                            </button>
-                            <button onClick={() => alert("Items added to Day 1!")} style={{
-                                padding: "8px 20px", borderRadius: 20,
-                                border: "1.5px solid var(--color-bg-accent-blue-subtle)",
-                                background: "var(--color-bg-accent-blue-subtler)", cursor: "pointer",
-                                fontSize: 13, fontWeight: 600, color: "#FFFDF6",
-                            }}>
-                                Add items to Day 1
-                            </button>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <div style={{
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    background: "var(--color-bg-accent-blue-subtler)",
+                                    color: "var(--color-text-selected)",
+                                    fontFamily: "var(--font-mono)", fontWeight: 500,
+                                    fontSize: 14, borderRadius: 8, width: 32, height: 32,
+                                }}>{count}</div>
+                                <span style={{ fontSize: 14, fontWeight: 500, color: "#FFFDF6" }}>
+                                    items selected
+                                </span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <button onClick={() => setExpanded(!expanded)} style={{
+                                    padding: "0 16px", borderRadius: 8, height: 40,
+                                    border: "1px solid var(--color-border-accent-blue-subtle, rgba(255,255,255,.35))",
+                                    background: "transparent", cursor: "pointer",
+                                    fontSize: 14, fontWeight: 500, color: "#FFFDF6",
+                                }}>
+                                    {expanded ? "Collapse" : "Review"}
+                                </button>
+                                <button onClick={() => alert("Items added to Day 1!")} style={{
+                                    padding: "0 16px", borderRadius: 8, height: 40,
+                                    border: "1px solid var(--color-bg-selected-bold)",
+                                    background: "var(--color-bg-accent-blue-default, #e1eceb)", cursor: "pointer",
+                                    fontSize: 14, fontWeight: 500,
+                                    color: "var(--color-text-selected, #205ea6)",
+                                }}>
+                                    Add items to Day 1
+                                </button>
+                            </div>
                         </div>
                     </div>
                 );
             }
 
-            /* ─── MapPlaceholder ──────────────────────────────────── */
-            function MapPlaceholder() {
+            /* ─── Mapbox token ────────────────────────────────────── */
+            const MAPBOX_TOKEN = "pk.eyJ1Ijoib2NyZXVyZXIiLCJhIjoiY2thNWcydHd0MGVieTNncXlhbmx6ajJ2eSJ9.OEcyIWzbV9-kwdpRVqSmLg";
+
+            /* ─── MapPanel ───────────────────────────────────────── */
+            function MapPanel({ items, selectedIds, isDark, activeRegions, onToggle }) {
+                const containerRef = useRef(null);
+                const mapRef = useRef(null);
+                const readyRef = useRef(false);
+                const dataRef = useRef({ items, selectedIds, activeRegions, onToggle });
+                dataRef.current = { items, selectedIds, activeRegions, onToggle };
+
+                // initialise map once
+                useEffect(() => {
+                    if (!containerRef.current || mapRef.current) return;
+                    mapboxgl.accessToken = MAPBOX_TOKEN;
+                    const map = new mapboxgl.Map({
+                        container: containerRef.current,
+                        style: "mapbox://styles/mapbox/standard",
+                        center: [-73.575, 45.510],
+                        zoom: 1,
+                        pitch: 0,
+                        bearing: -40,
+                        attributionControl: true,
+                        config: {
+                            basemap: {
+                                theme: "monochrome",
+                                lightPreset: "dawn",
+                                showPointOfInterestLabels: false,
+                                showPlaceLabels: false,
+                                showTransitLabels: false,
+                            },
+                        },
+                    });
+                    map.addControl(new mapboxgl.NavigationControl(), "top-left");
+
+                    map.on("load", () => {
+                        /* empty source — we'll update it via the other effect */
+                        map.addSource("explorer-points", {
+                            type: "geojson",
+                            data: { type: "FeatureCollection", features: [] },
+                        });
+
+                        /* circle layer for all results */
+                        map.addLayer({
+                            id: "explorer-circles",
+                            type: "circle",
+                            source: "explorer-points",
+                            paint: {
+                                "circle-radius": ["case", ["get", "selected"], 7, 5],
+                                "circle-color": ["get", "color"],
+                                "circle-stroke-width": ["case", ["get", "selected"], 2.5, 1.5],
+                                "circle-stroke-color": ["get", "stroke"],
+                                "circle-opacity": 0.9,
+                                "circle-emissive-strength": 1,
+                                "circle-stroke-emissive-strength": 1,
+                            },
+                        });
+
+                        /* name labels — only visible at high zoom */
+                        map.addLayer({
+                            id: "explorer-labels",
+                            type: "symbol",
+                            source: "explorer-points",
+                            minzoom: 13.5,
+                            layout: {
+                                "text-field": ["get", "name"],
+                                "text-font": ["DIN Pro Medium", "Arial Unicode MS Regular"],
+                                "text-size": 12,
+                                "text-anchor": "bottom",
+                                "text-offset": [0, -0.8],
+                                "text-max-width": 10,
+                            },
+                            paint: {
+                                "text-color": ["get", "color"],
+                                "text-halo-color": "#ffffff",
+                                "text-halo-width": 1.5,
+                                "text-emissive-strength": 1,
+                            },
+                        });
+
+                        /* click marker or label to toggle selection */
+                        const handleMarkerClick = (e) => {
+                            const f = e.features[0];
+                            const id = f.properties.id;
+                            if (id != null && dataRef.current.onToggle) {
+                                dataRef.current.onToggle(id);
+                            }
+                        };
+                        map.on("click", "explorer-circles", handleMarkerClick);
+                        map.on("click", "explorer-labels", handleMarkerClick);
+                        map.on("mouseenter", "explorer-circles", () => { map.getCanvas().style.cursor = "pointer"; });
+                        map.on("mouseleave", "explorer-circles", () => { map.getCanvas().style.cursor = ""; });
+                        map.on("mouseenter", "explorer-labels", () => { map.getCanvas().style.cursor = "pointer"; });
+                        map.on("mouseleave", "explorer-labels", () => { map.getCanvas().style.cursor = ""; });
+
+                        /* region boundary polygon layers */
+                        map.addSource("region-boundary", {
+                            type: "geojson",
+                            data: { type: "FeatureCollection", features: [] },
+                        });
+                        map.addLayer({
+                            id: "region-boundary-fill",
+                            type: "fill",
+                            source: "region-boundary",
+                            paint: { "fill-color": "#205EA6", "fill-opacity": 0.08, "fill-emissive-strength": 1 },
+                        }, "explorer-circles");
+                        map.addLayer({
+                            id: "region-boundary-line",
+                            type: "line",
+                            source: "region-boundary",
+                            paint: { "line-color": "#205EA6", "line-width": 2.5, "line-opacity": 0.45, "line-emissive-strength": 1 },
+                        }, "explorer-circles");
+
+                        /* populate initial markers from current data */
+                        const { items: itms, selectedIds: sel, activeRegions: ar } = dataRef.current;
+                        const feats = itms.map(item => ({
+                            type: "Feature",
+                            geometry: { type: "Point", coordinates: [item.lng, item.lat] },
+                            properties: {
+                                id: item.id, name: item.name, category: item.category,
+                                selected: sel.has(item.id),
+                                color: sel.has(item.id) ? "#205EA6" : (item.type === "POI" ? "#66800b" : "#bc5215"),
+                                stroke: sel.has(item.id) ? "#205EA6" : (item.type === "POI" ? "#66800b" : "#bc5215"),
+                            },
+                        }));
+                        map.getSource("explorer-points").setData({ type: "FeatureCollection", features: feats });
+
+                        /* populate initial region polygons if any are active */
+                        if (ar && ar.length > 0) {
+                            const polyFeats = ar
+                                .filter(r => REGION_BOUNDARIES[r])
+                                .map(r => ({
+                                    type: "Feature",
+                                    geometry: { type: "Polygon", coordinates: [REGION_BOUNDARIES[r]] },
+                                    properties: { region: r },
+                                }));
+                            map.getSource("region-boundary").setData({ type: "FeatureCollection", features: polyFeats });
+                            const bounds = new mapboxgl.LngLatBounds();
+                            polyFeats.forEach(f => {
+                                f.geometry.coordinates[0].forEach(c => bounds.extend(c));
+                            });
+                            itms.forEach(item => {
+                                if (ar.includes(item.region)) bounds.extend([item.lng, item.lat]);
+                            });
+                            map.fitBounds(bounds, {
+                                padding: { top: 80, bottom: 80, left: 60, right: 60 },
+                                duration: 1500, maxZoom: 15.5,
+                            });
+                        }
+
+                        /* opening fly-in: swoop down to fit all markers */
+                        const introBounds = new mapboxgl.LngLatBounds();
+                        feats.forEach(f => introBounds.extend(f.geometry.coordinates));
+                        setTimeout(() => {
+                            map.fitBounds(introBounds, {
+                                padding: { top: 60, bottom: 60, left: 60, right: 60 },
+                                pitch: 0,
+                                bearing: 0,
+                                duration: 3000,
+                                maxZoom: 15,
+                                easing: t => t < 0.5
+                                    ? 4 * t * t * t
+                                    : 1 - Math.pow(-2 * t + 2, 3) / 2,
+                            });
+                        }, 200);
+
+                        readyRef.current = true;
+                    });
+
+                    mapRef.current = map;
+                    return () => { map.remove(); mapRef.current = null; };
+                }, []);
+
+                // helper: build GeoJSON from current data
+                const updateMarkers = useCallback(() => {
+                    const map = mapRef.current;
+                    if (!map || !readyRef.current) return;
+                    const src = map.getSource("explorer-points");
+                    if (!src) return;
+                    const { items: itms, selectedIds: sel } = dataRef.current;
+                    const features = itms.map(item => {
+                        const isSel = sel.has(item.id);
+                        return {
+                            type: "Feature",
+                            geometry: { type: "Point", coordinates: [item.lng, item.lat] },
+                            properties: {
+                                id: item.id,
+                                name: item.name,
+                                category: item.category,
+                                selected: isSel,
+                                color: isSel ? "#205EA6" : (item.type === "POI" ? "#66800b" : "#bc5215"),
+                                stroke: isSel ? "#205EA6" : (item.type === "POI" ? "#66800b" : "#bc5215"),
+                            },
+                        };
+                    });
+                    src.setData({ type: "FeatureCollection", features });
+                }, []);
+
+                // update source whenever items or selection change
+                useEffect(() => { updateMarkers(); }, [items, selectedIds]);
+
+                // switch light preset on dark mode toggle + re-apply markers + polygon opacity
+                useEffect(() => {
+                    const map = mapRef.current;
+                    if (!map || !readyRef.current) return;
+                    map.setConfigProperty("basemap", "lightPreset", isDark ? "night" : "dawn");
+                    // boost polygon visibility in dark mode
+                    if (map.getLayer("region-boundary-fill")) {
+                        map.setPaintProperty("region-boundary-fill", "fill-color", isDark ? "#4385BE" : "#205EA6");
+                        map.setPaintProperty("region-boundary-fill", "fill-opacity", isDark ? 0.25 : 0.08);
+                    }
+                    if (map.getLayer("region-boundary-line")) {
+                        map.setPaintProperty("region-boundary-line", "line-color", isDark ? "#4385BE" : "#205EA6");
+                        map.setPaintProperty("region-boundary-line", "line-opacity", isDark ? 0.7 : 0.45);
+                    }
+                    // dark halo on labels in dark mode
+                    if (map.getLayer("explorer-labels")) {
+                        map.setPaintProperty("explorer-labels", "text-halo-color", isDark ? "#1C1B1A" : "#ffffff");
+                    }
+                    setTimeout(() => updateMarkers(), 150);
+                }, [isDark]);
+
+                // draw region boundary polygons + fit bounds when regions change
+                useEffect(() => {
+                    const map = mapRef.current;
+                    if (!map || !readyRef.current) return;
+                    const src = map.getSource("region-boundary");
+                    if (!src) return;
+
+                    if (!activeRegions || activeRegions.length === 0) {
+                        // clear polygons, fit to all current markers
+                        src.setData({ type: "FeatureCollection", features: [] });
+                        const { items: itms } = dataRef.current;
+                        const resetBounds = new mapboxgl.LngLatBounds();
+                        itms.forEach(item => resetBounds.extend([item.lng, item.lat]));
+                        if (!resetBounds.isEmpty()) {
+                            map.fitBounds(resetBounds, {
+                                padding: { top: 60, bottom: 60, left: 60, right: 60 },
+                                pitch: 0, bearing: 0, duration: 1200, maxZoom: 15,
+                            });
+                        }
+                        return;
+                    }
+
+                    // build polygon features for each active region
+                    const features = activeRegions
+                        .filter(r => REGION_BOUNDARIES[r])
+                        .map(r => ({
+                            type: "Feature",
+                            geometry: { type: "Polygon", coordinates: [REGION_BOUNDARIES[r]] },
+                            properties: { region: r },
+                        }));
+                    src.setData({ type: "FeatureCollection", features });
+
+                    // fit bounds to selected regions
+                    const bounds = new mapboxgl.LngLatBounds();
+                    features.forEach(f => {
+                        f.geometry.coordinates[0].forEach(c => bounds.extend(c));
+                    });
+                    // also include the markers within these regions
+                    items.forEach(item => {
+                        if (activeRegions.includes(item.region)) {
+                            bounds.extend([item.lng, item.lat]);
+                        }
+                    });
+                    map.fitBounds(bounds, {
+                        padding: { top: 80, bottom: 80, left: 60, right: 60 },
+                        duration: 1500,
+                        maxZoom: 15.5,
+                    });
+                }, [activeRegions]);
+
                 return (
-                    <div style={{
-                        flex: 1, background: "#CED5AB",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        color: "rgba(0,0,0,.15)", fontSize: 18, fontWeight: 600,
-                        letterSpacing: 1,
-                    }}>
-                    </div>
+                    <div ref={containerRef} style={{ flex: 1, minWidth: 0 }} />
                 );
             }
 
@@ -768,6 +1219,7 @@
                 const [activeTab, setActiveTab] = useState("all");
                 const [filters, setFilters] = useState([]);
                 const [selectedIds, setSelectedIds] = useState(new Set());
+                const [cartExpanded, setCartExpanded] = useState(false);
 
                 const toggleDark = useCallback(() => {
                     setIsDark(prev => {
@@ -856,6 +1308,11 @@
 
                 const selectedItems = ITEMS.filter(i => selectedIds.has(i.id));
 
+                const activeRegions = useMemo(() => {
+                    const rf = filters.find(f => f.field === "Region");
+                    return rf && rf.values.length > 0 ? rf.values : [];
+                }, [filters]);
+
                 const addFilter = useCallback((f) => setFilters(prev => [...prev, f]), []);
                 const removeFilter = useCallback((idx) => setFilters(prev => prev.filter((_, i) => i !== idx)), []);
                 const updateFilter = useCallback((idx, values) => {
@@ -868,16 +1325,25 @@
                         fontFamily: "var(--body-font), sans-serif",
                         position: "relative",
                     }}>
-                        {/* ─── Left sidebar ───────────────────────── */}
+                        {/* ─── Left panel (map) ─────────────────── */}
+                        <MapPanel
+                            items={filteredItems}
+                            selectedIds={selectedIds}
+                            isDark={isDark}
+                            activeRegions={activeRegions}
+                            onToggle={toggleItem}
+                        />
+
+                        {/* ─── Right panel (explorer) ───────────────── */}
                         <div style={{
-                            width: "45%", minWidth: 420, display: "flex", flexDirection: "column",
-                            position: "relative", borderRight: "1px solid var(--color-border-default)",
+                            width: 520, flexShrink: 0, display: "flex", flexDirection: "column",
+                            position: "relative", borderLeft: "1px solid var(--color-border-default)",
                         }}>
                             {/* Header */}
-                            <div style={{ padding: "36px 28px 0" }}>
+                            <div style={{ padding: "64px 48px 24px", borderBottom: "1px solid var(--color-border-default)" }}>
                                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
                                     <h1 style={{
-                                        fontFamily: "'Platypi', serif", fontSize: 28, fontWeight: 600,
+                                        fontFamily: "Outfit", fontSize: 24, fontWeight: 600,
                                         lineHeight: 1.2, margin: 0,
                                     }}>Explorer</h1>
                                     <button onClick={toggleDark} style={{
@@ -916,17 +1382,19 @@
                                 onToggle={toggleItem}
                                 onSelectAll={selectAll}
                             />
-
-                            {/* Selection tray */}
-                            <SelectionTray
-                                selectedItems={selectedItems}
-                                onRemove={(id) => toggleItem(id)}
-                                onClearAll={() => setSelectedIds(new Set())}
-                            />
                         </div>
 
-                        {/* ─── Right panel (map placeholder) ──────── */}
-                        <MapPlaceholder />
+                        {/* ─── Cart scrim + overlay ─────────────────── */}
+                        <div
+                            className={`cart-scrim ${cartExpanded && selectedItems.length > 0 ? "active" : ""}`}
+                            onClick={() => setCartExpanded(false)}
+                        />
+                        <Cart
+                            selectedItems={selectedItems}
+                            onRemove={(id) => toggleItem(id)}
+                            expanded={cartExpanded}
+                            setExpanded={setCartExpanded}
+                        />
                     </div>
                 );
             }
