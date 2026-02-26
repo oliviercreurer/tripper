@@ -66,6 +66,7 @@
                 --color-text-accent-green-bolder: #536907;
                 --color-text-accent-purple: #5E409D;
                 --color-text-accent-yellow: #AD8301;
+                --color-text-danger: #AF3029;
 
                 /* Icon */
                 --color-icon-normal: #100F0F;
@@ -149,6 +150,7 @@
                 --color-text-accent-green-bolder: #BEC97E;
                 --color-text-accent-purple: #A699D0;
                 --color-text-accent-yellow: #DFB431;
+                --color-text-danger: #D14D41;
 
                 --color-icon-normal: #CECDC3;
                 --color-icon-subtle: #878580;
@@ -324,6 +326,9 @@
             .filter-dropdown {
                 animation: dropdownIn .15s ease;
             }
+            html.dark .filter-cat-icon {
+                filter: invert(1);
+            }
             @keyframes dropdownIn {
                 from { opacity: 0; transform: translateY(-4px); }
                 to   { opacity: 1; transform: translateY(0); }
@@ -362,59 +367,59 @@
                 { id: 3,  name: "McCord Stewart Museum",         category: "Cultural Attraction", type: "POI",      region: "Downtown",    tags: ["Museum"],       lat: 45.5040, lng: -73.5736 },
                 { id: 4,  name: "Basilique Notre-Dame",          category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Historic"],    lat: 45.5046, lng: -73.5566 },
                 { id: 5,  name: "Bonsecours Market",             category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Historic"],    lat: 45.5087, lng: -73.5520 },
-                { id: 6,  name: "Cardinal Café",                 category: "Food & Beverage",     type: "Business", region: "Downtown",    tags: ["Coffee"],       lat: 45.5025, lng: -73.5717 },
-                { id: 7,  name: "Dunya",                         category: "Food & Beverage",     type: "Business", region: "Downtown",    tags: ["Middle Eastern"], lat: 45.5063, lng: -73.5680 },
-                { id: 8,  name: "Chez Laurent",                  category: "Food & Beverage",     type: "Business", region: "Downtown",    tags: ["French"],       lat: 45.5010, lng: -73.5759 },
-                { id: 9,  name: "Maison Boulud",                 category: "Food & Beverage",     type: "Business", region: "Downtown",    tags: ["Fine Dining"],  lat: 45.5005, lng: -73.5729 },
+                { id: 6,  name: "Cardinal Café",                 category: "Food & Beverage",     subcategory: "Café",             type: "Business", region: "Downtown",    tags: ["Coffee"],       lat: 45.5025, lng: -73.5717 },
+                { id: 7,  name: "Dunya",                         category: "Food & Beverage",     subcategory: "Middle Eastern",   type: "Business", region: "Downtown",    tags: ["Middle Eastern"], lat: 45.5063, lng: -73.5680 },
+                { id: 8,  name: "Chez Laurent",                  category: "Food & Beverage",     subcategory: "French",           type: "Business", region: "Downtown",    tags: ["French"],       lat: 45.5010, lng: -73.5759 },
+                { id: 9,  name: "Maison Boulud",                 category: "Food & Beverage",     subcategory: "Fine Dining",      type: "Business", region: "Downtown",    tags: ["Fine Dining"],  lat: 45.5005, lng: -73.5729 },
                 { id: 10, name: "Hôtel Birks",                   category: "Accommodation",       type: "Business", region: "Downtown",    tags: ["Luxury"],       lat: 45.5020, lng: -73.5735 },
                 // ── Plateau Mont-Royal ──
-                { id: 11, name: "Le Plateau Bistro",             category: "Food & Beverage",     type: "Business", region: "Plateau",     tags: ["Brunch"],       lat: 45.5225, lng: -73.5776 },
-                { id: 12, name: "Schwartz's Deli",               category: "Food & Beverage",     type: "Business", region: "Plateau",     tags: ["Iconic"],       lat: 45.5189, lng: -73.5774 },
-                { id: 13, name: "Beauty's Luncheonette",         category: "Food & Beverage",     type: "Business", region: "Plateau",     tags: ["Brunch"],       lat: 45.5208, lng: -73.5850 },
+                { id: 11, name: "Le Plateau Bistro",             category: "Food & Beverage",     subcategory: "Brunch & Breakfast", type: "Business", region: "Plateau",     tags: ["Brunch"],       lat: 45.5225, lng: -73.5776 },
+                { id: 12, name: "Schwartz's Deli",               category: "Food & Beverage",     subcategory: "Deli & Smoked Meat", type: "Business", region: "Plateau",     tags: ["Iconic"],       lat: 45.5189, lng: -73.5774 },
+                { id: 13, name: "Beauty's Luncheonette",         category: "Food & Beverage",     subcategory: "Brunch & Breakfast", type: "Business", region: "Plateau",     tags: ["Brunch"],       lat: 45.5208, lng: -73.5850 },
                 { id: 14, name: "Librairie Drawn & Quarterly",   category: "Retail",              type: "Business", region: "Plateau",     tags: ["Books"],        lat: 45.5256, lng: -73.5851 },
                 { id: 15, name: "Parc La Fontaine",              category: "Provincial Park",     type: "POI",      region: "Plateau",     tags: ["Park"],         lat: 45.5283, lng: -73.5689 },
                 { id: 16, name: "Tam-Tams du Mont Royal",        category: "Cultural Attraction", type: "POI",      region: "Plateau",     tags: ["Music"],        lat: 45.5155, lng: -73.5878 },
                 // ── Mile End / Mile-Ex ──
-                { id: 17, name: "Fairmount Bagel",               category: "Food & Beverage",     type: "Business", region: "Mile End",    tags: ["Iconic"],       lat: 45.5244, lng: -73.5974 },
-                { id: 18, name: "St-Viateur Bagel",              category: "Food & Beverage",     type: "Business", region: "Mile End",    tags: ["Iconic"],       lat: 45.5233, lng: -73.6012 },
-                { id: 19, name: "Dieu du Ciel!",                 category: "Food & Beverage",     type: "Business", region: "Mile End",    tags: ["Brewery"],      lat: 45.5275, lng: -73.5976 },
+                { id: 17, name: "Fairmount Bagel",               category: "Food & Beverage",     subcategory: "Bakery & Bagels",  type: "Business", region: "Mile End",    tags: ["Iconic"],       lat: 45.5244, lng: -73.5974 },
+                { id: 18, name: "St-Viateur Bagel",              category: "Food & Beverage",     subcategory: "Bakery & Bagels",  type: "Business", region: "Mile End",    tags: ["Iconic"],       lat: 45.5233, lng: -73.6012 },
+                { id: 19, name: "Dieu du Ciel!",                 category: "Food & Beverage",     subcategory: "Bar & Brewery",    type: "Business", region: "Mile End",    tags: ["Brewery"],      lat: 45.5275, lng: -73.5976 },
                 { id: 20, name: "Marché Jean-Talon",             category: "Retail",              type: "POI",      region: "Mile End",    tags: ["Market"],       lat: 45.5372, lng: -73.6146 },
-                { id: 21, name: "Club Social",                   category: "Food & Beverage",     type: "Business", region: "Mile End",    tags: ["Coffee"],       lat: 45.5213, lng: -73.5979 },
+                { id: 21, name: "Club Social",                   category: "Food & Beverage",     subcategory: "Café",             type: "Business", region: "Mile End",    tags: ["Coffee"],       lat: 45.5213, lng: -73.5979 },
                 // ── Old Montreal ──
                 { id: 22, name: "Science Centre",                category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Museum"],      lat: 45.5055, lng: -73.5523 },
                 { id: 23, name: "Clock Tower",                   category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Historic"],    lat: 45.5104, lng: -73.5464 },
                 { id: 24, name: "Old Port Skating Rink",         category: "Cultural Attraction", type: "POI",      region: "Old Montreal", tags: ["Sports"],      lat: 45.5048, lng: -73.5539 },
-                { id: 25, name: "Olive et Gourmando",            category: "Food & Beverage",     type: "Business", region: "Old Montreal", tags: ["Brunch"],      lat: 45.5030, lng: -73.5568 },
-                { id: 26, name: "Le Petit Dep",                  category: "Food & Beverage",     type: "Business", region: "Old Montreal", tags: ["Coffee"],      lat: 45.5041, lng: -73.5541 },
+                { id: 25, name: "Olive et Gourmando",            category: "Food & Beverage",     subcategory: "Brunch & Breakfast", type: "Business", region: "Old Montreal", tags: ["Brunch"],      lat: 45.5030, lng: -73.5568 },
+                { id: 26, name: "Le Petit Dep",                  category: "Food & Beverage",     subcategory: "Café",             type: "Business", region: "Old Montreal", tags: ["Coffee"],      lat: 45.5041, lng: -73.5541 },
                 { id: 27, name: "Auberge du Vieux-Port",         category: "Accommodation",       type: "Business", region: "Old Montreal", tags: ["Boutique"],    lat: 45.5068, lng: -73.5505 },
                 // ── Griffintown / Saint-Henri ──
-                { id: 28, name: "Joe Beef",                      category: "Food & Beverage",     type: "Business", region: "Griffintown",  tags: ["Fine Dining"], lat: 45.4830, lng: -73.5784 },
+                { id: 28, name: "Joe Beef",                      category: "Food & Beverage",     subcategory: "Fine Dining",      type: "Business", region: "Griffintown",  tags: ["Fine Dining"], lat: 45.4830, lng: -73.5784 },
                 { id: 29, name: "Atwater Market",                category: "Retail",              type: "POI",      region: "Griffintown",  tags: ["Market"],      lat: 45.4829, lng: -73.5845 },
                 { id: 30, name: "Lachine Canal Path",            category: "Provincial Park",     type: "POI",      region: "Griffintown",  tags: ["Cycling"],     lat: 45.4815, lng: -73.5735 },
-                { id: 31, name: "Canal Lounge",                  category: "Food & Beverage",     type: "Business", region: "Griffintown",  tags: ["Bar"],         lat: 45.4870, lng: -73.5677 },
-                { id: 32, name: "Rustique Pie Kitchen",          category: "Food & Beverage",     type: "Business", region: "Griffintown",  tags: ["Bakery"],      lat: 45.4847, lng: -73.5712 },
+                { id: 31, name: "Canal Lounge",                  category: "Food & Beverage",     subcategory: "Bar & Brewery",    type: "Business", region: "Griffintown",  tags: ["Bar"],         lat: 45.4870, lng: -73.5677 },
+                { id: 32, name: "Rustique Pie Kitchen",          category: "Food & Beverage",     subcategory: "Bakery & Bagels",  type: "Business", region: "Griffintown",  tags: ["Bakery"],      lat: 45.4847, lng: -73.5712 },
                 // ── Mont Royal / Outremont ──
                 { id: 33, name: "Mont Royal Summit",             category: "Provincial Park",     type: "POI",      region: "Mont Royal",   tags: ["Park", "Hiking"], lat: 45.5045, lng: -73.5878 },
                 { id: 34, name: "Beaver Lake",                   category: "Provincial Park",     type: "POI",      region: "Mont Royal",   tags: ["Park"],        lat: 45.4993, lng: -73.5962 },
                 { id: 35, name: "Smith House",                   category: "Cultural Attraction", type: "POI",      region: "Mont Royal",   tags: ["Historic"],    lat: 45.5036, lng: -73.5896 },
                 { id: 36, name: "Oratoire Saint-Joseph",         category: "Cultural Attraction", type: "POI",      region: "Mont Royal",   tags: ["Historic"],    lat: 45.4917, lng: -73.6170 },
-                { id: 37, name: "Leméac",                        category: "Food & Beverage",     type: "Business", region: "Mont Royal",   tags: ["French"],      lat: 45.5167, lng: -73.6070 },
+                { id: 37, name: "Leméac",                        category: "Food & Beverage",     subcategory: "French",           type: "Business", region: "Mont Royal",   tags: ["French"],      lat: 45.5167, lng: -73.6070 },
                 // ── Hochelaga / East End ──
                 { id: 38, name: "Jardin Botanique",              category: "Provincial Park",     type: "POI",      region: "Hochelaga",    tags: ["Park"],        lat: 45.5576, lng: -73.5625 },
                 { id: 39, name: "Biodome",                       category: "Cultural Attraction", type: "POI",      region: "Hochelaga",    tags: ["Museum"],      lat: 45.5599, lng: -73.5508 },
                 { id: 40, name: "Olympic Stadium",               category: "Cultural Attraction", type: "POI",      region: "Hochelaga",    tags: ["Sports", "Iconic"], lat: 45.5579, lng: -73.5516 },
                 { id: 41, name: "Insectarium",                   category: "Cultural Attraction", type: "POI",      region: "Hochelaga",    tags: ["Museum"],      lat: 45.5568, lng: -73.5587 },
-                { id: 42, name: "Café Dispatch",                 category: "Food & Beverage",     type: "Business", region: "Hochelaga",    tags: ["Coffee"],      lat: 45.5415, lng: -73.5450 },
+                { id: 42, name: "Café Dispatch",                 category: "Food & Beverage",     subcategory: "Café",             type: "Business", region: "Hochelaga",    tags: ["Coffee"],      lat: 45.5415, lng: -73.5450 },
                 // ── Verdun / South Shore ──
                 { id: 43, name: "Verdun Beach",                  category: "Provincial Park",     type: "POI",      region: "Verdun",       tags: ["Park"],        lat: 45.4600, lng: -73.5670 },
                 { id: 44, name: "Wellington Street Shops",        category: "Retail",              type: "Business", region: "Verdun",       tags: ["Shopping"],    lat: 45.4590, lng: -73.5720 },
-                { id: 45, name: "Palco",                         category: "Food & Beverage",     type: "Business", region: "Verdun",       tags: ["Bar"],         lat: 45.4596, lng: -73.5694 },
+                { id: 45, name: "Palco",                         category: "Food & Beverage",     subcategory: "Bar & Brewery",    type: "Business", region: "Verdun",       tags: ["Bar"],         lat: 45.4596, lng: -73.5694 },
                 // ── Rosemont / Petite-Patrie ──
                 { id: 46, name: "Marché de la Petite-Patrie",    category: "Retail",              type: "POI",      region: "Rosemont",     tags: ["Market"],      lat: 45.5345, lng: -73.6050 },
                 { id: 47, name: "Hôtel Le Germain",              category: "Accommodation",       type: "Business", region: "Downtown",     tags: ["Boutique"],    lat: 45.5015, lng: -73.5700 },
                 { id: 48, name: "Auberge Bishop",                category: "Accommodation",       type: "Business", region: "Downtown",     tags: ["Budget"],      lat: 45.4980, lng: -73.5730 },
                 { id: 49, name: "Gîte du Plateau",               category: "Accommodation",       type: "Business", region: "Plateau",      tags: ["B&B"],         lat: 45.5240, lng: -73.5815 },
-                { id: 50, name: "La Pêche Fraîche",              category: "Food & Beverage",     type: "Business", region: "Rosemont",     tags: ["Seafood"],     lat: 45.5380, lng: -73.5920 },
+                { id: 50, name: "La Pêche Fraîche",              category: "Food & Beverage",     subcategory: "Seafood",          type: "Business", region: "Rosemont",     tags: ["Seafood"],     lat: 45.5380, lng: -73.5920 },
             ];
 
             /* ─── Region boundaries (closed polygons, [lng, lat]) ── */
@@ -457,11 +462,79 @@
                 ],
             };
 
-            const FILTER_OPTIONS = {
-                "Region":        [...new Set(ITEMS.map(i => i.region))],
-                "Category":      [...new Set(ITEMS.map(i => i.category))],
-                "Custom Tag":    [...new Set(ITEMS.flatMap(i => i.tags))].filter(Boolean),
-            };
+            /* ─── Filter category hierarchy ─────────────────────── */
+            const FILTER_CATEGORIES = [
+                {
+                    id: "category",
+                    label: "Business Type",
+                    icon: "assets/home-alt.svg",
+                    field: "category",
+                    rules: ["is", "is not"],
+                    options: (() => {
+                        const cats = [...new Set(ITEMS.map(i => i.category))].sort();
+                        return cats.map(c => {
+                            /* build children from subcategory field if present */
+                            const subs = [...new Set(
+                                ITEMS.filter(i => i.category === c && i.subcategory)
+                                     .map(i => i.subcategory)
+                            )].sort();
+                            return subs.length > 0
+                                ? { id: c, label: c, children: subs }
+                                : { id: c, label: c };
+                        });
+                    })(),
+                },
+                {
+                    id: "region",
+                    label: "Region",
+                    icon: "assets/map.svg",
+                    field: "region",
+                    rules: ["is", "is not"],
+                    options: [...new Set(ITEMS.map(i => i.region))].sort().map(r => ({ id: r, label: r })),
+                },
+                {
+                    id: "tags",
+                    label: "Custom Tags",
+                    icon: "assets/label.svg",
+                    field: "tags",
+                    rules: ["is", "is not"],
+                    options: [...new Set(ITEMS.flatMap(i => i.tags))].filter(Boolean).sort().map(t => ({ id: t, label: t })),
+                },
+            ];
+
+            /* helpers for filter logic */
+            function flattenSelections(selected, category) {
+                const vals = [];
+                for (const [optId, sel] of Object.entries(selected)) {
+                    const opt = category.options.find(o => o.id === optId);
+                    if (!opt) continue;
+                    if (opt.children && opt.children.length > 0) {
+                        if (sel === "all") {
+                            /* parent fully selected → match by parent category */
+                            vals.push(optId);
+                        } else if (sel instanceof Set || (typeof sel === "object" && sel.size !== undefined)) {
+                            vals.push(...sel);
+                        } else if (Array.isArray(sel)) {
+                            vals.push(...sel);
+                        }
+                    } else {
+                        vals.push(optId);
+                    }
+                }
+                return vals;
+            }
+
+            function matchesFilter(item, field, selectedValues) {
+                if (field === "tags") return item.tags.some(t => selectedValues.includes(t));
+                /* check primary field (e.g. category) and subcategory */
+                return selectedValues.includes(item[field])
+                    || (item.subcategory && selectedValues.includes(item.subcategory));
+            }
+
+            function getFieldValue(item, field) {
+                if (field === "tags") return item.tags && item.tags.length > 0 ? item.tags.join(",") : "";
+                return item[field] || "";
+            }
 
             /* ─── Type color mapping ──────────────────────────────── */
             const TYPE_COLORS = {
@@ -488,22 +561,26 @@
                     "circle-x": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>,
                     "arrow-right": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
                     "arrow-left": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+                    "chevron-right": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>,
+                    minus: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>,
                 };
                 return icons[name] || null;
             };
 
             /* ─── Checkbox ────────────────────────────────────────── */
-            function Checkbox({ checked, onChange, size = 18 }) {
+            function Checkbox({ checked, indeterminate, onChange, size = 18 }) {
+                const filled = checked || indeterminate;
                 return (
                     <div onClick={e => { e.stopPropagation(); onChange(!checked); }} style={{
                         width: size, height: size, borderRadius: 4, cursor: "pointer",
-                        border: checked ? "none" : "1.5px solid var(--color-border-bold)",
-                        background: checked ? "var(--color-bg-selected-bold)" : "transparent",
+                        border: filled ? "none" : "1.5px solid var(--color-border-bold)",
+                        background: filled ? "var(--color-bg-selected-bold)" : "transparent",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         transition: "background .15s ease, border .15s ease",
                         flexShrink: 0,
                     }}>
-                        {checked && <Icon name="check" size={12} color="var(--color-text-inverse)" />}
+                        {indeterminate && <Icon name="minus" size={12} color="var(--color-text-inverse)" />}
+                        {checked && !indeterminate && <Icon name="check" size={12} color="var(--color-text-inverse)" />}
                     </div>
                 );
             }
@@ -555,33 +632,489 @@
                 Area:     "#2d847c",
             };
 
-            /* ─── FilterBar ───────────────────────────────────────── */
-            function FilterBar({ filters, onAddFilter, onRemoveFilter, onUpdateFilter }) {
-                const [showAddMenu, setShowAddMenu] = useState(false);
-                const addRef = useRef(null);
+            /* ─── Filter popover search input ─────────────────────── */
+            function FilterSearch({ value, onChange, placeholder = "Search..." }) {
+                return (
+                    <div style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        background: "var(--color-bg-secondary)",
+                        border: "1px solid var(--color-border-default)",
+                        borderRadius: 8, padding: "8px 12px",
+                    }}>
+                        <Icon name="search" size={16} color="var(--color-icon-subtle)" />
+                        <input value={value} onChange={e => onChange(e.target.value)}
+                            placeholder={placeholder}
+                            style={{
+                                flex: 1, border: "none", outline: "none", fontSize: 14,
+                                background: "transparent", color: "var(--color-text-default)",
+                                fontFamily: "inherit",
+                            }}
+                        />
+                    </div>
+                );
+            }
 
-                // close dropdown on outside click
+            /* ─── RuleDropdown ────────────────────────────────────── */
+            function RuleDropdown({ rules, current, onSelect, onClose }) {
+                const ref = useRef(null);
                 useEffect(() => {
-                    if (!showAddMenu) return;
+                    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
+                    document.addEventListener("mousedown", handler);
+                    return () => document.removeEventListener("mousedown", handler);
+                }, [onClose]);
+                return (
+                    <div ref={ref} className="filter-dropdown" style={{
+                        position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 30,
+                        background: "var(--color-bg-secondary)", borderRadius: 8,
+                        boxShadow: "var(--shadow-overlay)", minWidth: 160,
+                        border: "1px solid var(--color-border-default)", padding: 4,
+                    }}>
+                        {rules.map(r => (
+                            <div key={r} onClick={() => { onSelect(r); onClose(); }} style={{
+                                padding: "8px 12px", cursor: "pointer", fontSize: 14, fontWeight: 400,
+                                color: "var(--color-text-default)", borderRadius: 6,
+                                transition: "background .1s",
+                                textTransform: "capitalize",
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = "var(--color-bg-tertiary)"}
+                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                                {r.charAt(0).toUpperCase() + r.slice(1)}
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
+
+            /* ─── FilterPopover ───────────────────────────────────── */
+            function FilterPopover({ isOpen, onClose, filter, categoryId, onSave, onDelete }) {
+                /*
+                 * Draft-then-save model: selections are local until Save is clicked.
+                 * filter = existing filter object (editing) or null (creating new).
+                 */
+                const [screen, setScreen] = useState("categories");
+                const [activeCatId, setActiveCatId] = useState(null);
+                const [activeOptId, setActiveOptId] = useState(null);
+                const [catSearch, setCatSearch] = useState("");
+                const [foSearch, setFoSearch] = useState("");
+                const [soSearch, setSoSearch] = useState("");
+                const [showRuleMenu, setShowRuleMenu] = useState(false);
+                const [draftSelected, setDraftSelected] = useState({});
+                const [draftRule, setDraftRule] = useState("is");
+                const popRef = useRef(null);
+
+                const isEditing = !!filter;
+
+                /* reset navigation + draft when the popover first opens */
+                const prevOpenRef = useRef(false);
+                useEffect(() => {
+                    if (isOpen && !prevOpenRef.current) {
+                        if (categoryId) {
+                            setActiveCatId(categoryId);
+                            setScreen("first-order");
+                        } else {
+                            setScreen("categories");
+                            setActiveCatId(null);
+                        }
+                        setActiveOptId(null);
+                        setCatSearch(""); setFoSearch(""); setSoSearch("");
+                        setShowRuleMenu(false);
+                        /* initialise draft from existing filter or blank */
+                        setDraftSelected(filter ? { ...filter.selected } : {});
+                        setDraftRule(filter ? filter.rule : "is");
+                    }
+                    prevOpenRef.current = isOpen;
+                }, [isOpen, categoryId]);
+
+                /* close on outside click */
+                useEffect(() => {
+                    if (!isOpen) return;
                     const handler = (e) => {
-                        if (addRef.current && !addRef.current.contains(e.target)) setShowAddMenu(false);
+                        if (popRef.current && !popRef.current.contains(e.target)) onClose();
                     };
                     document.addEventListener("mousedown", handler);
                     return () => document.removeEventListener("mousedown", handler);
-                }, [showAddMenu]);
+                }, [isOpen, onClose]);
 
-                const usedFields = filters.map(f => f.field);
-                const availableFields = Object.keys(FILTER_OPTIONS).filter(f => !usedFields.includes(f));
+                /* clamp popover inside the explorer panel (horizontal + vertical) */
+                const [nudge, setNudge] = useState(0);
+                const [maxH, setMaxH] = useState(600);
+                useEffect(() => {
+                    if (!isOpen) { setNudge(0); setMaxH(600); return; }
+                    const id = requestAnimationFrame(() => {
+                        if (!popRef.current) return;
+                        const el = popRef.current;
+                        const margin = 12;
+                        /* horizontal clamping */
+                        el.style.left = "0px";
+                        const pop = el.getBoundingClientRect();
+                        let panel = el.parentElement;
+                        while (panel && panel.offsetWidth < 500) panel = panel.parentElement;
+                        if (!panel) return;
+                        const panelRect = panel.getBoundingClientRect();
+                        let shift = 0;
+                        if (pop.right > panelRect.right - margin) shift = panelRect.right - margin - pop.right;
+                        if (pop.left + shift < panelRect.left + margin) shift = panelRect.left + margin - pop.left;
+                        el.style.left = shift + "px";
+                        setNudge(shift);
+                        /* vertical clamping — cap height so footer stays on-screen */
+                        const available = window.innerHeight - pop.top - margin;
+                        setMaxH(Math.max(200, available));
+                    });
+                    return () => cancelAnimationFrame(id);
+                });
+
+                if (!isOpen) return null;
+
+                const activeCat = FILTER_CATEGORIES.find(c => c.id === activeCatId);
+                const activeOpt = activeCat ? activeCat.options.find(o => o.id === activeOptId) : null;
+
+                /* ── draft validity (is Save enabled?) ── */
+                const draftHasSelections = Object.keys(draftSelected).length > 0;
+                const canSave = screen !== "categories" && (
+                    draftRule === "is empty" || draftRule === "is not empty" || draftHasSelections
+                );
+
+                /* ── selection helpers (operate on draft) ── */
+                const isFirstOrderChecked = (optId) => !!draftSelected[optId];
+                const isFirstOrderIndeterminate = (optId) => {
+                    const sel = draftSelected[optId];
+                    if (!sel) return false;
+                    const opt = activeCat.options.find(o => o.id === optId);
+                    if (!opt || !opt.children || opt.children.length === 0) return false;
+                    return sel !== "all" && sel.size < opt.children.length;
+                };
+
+                const toggleFirstOrder = (optId) => {
+                    setDraftSelected(prev => {
+                        const next = { ...prev };
+                        if (next[optId]) delete next[optId]; else next[optId] = "all";
+                        return next;
+                    });
+                };
+
+                const isSecondOrderChecked = (childId) => {
+                    const sel = draftSelected[activeOptId];
+                    if (!sel) return false;
+                    if (sel === "all") return true;
+                    return sel.has(childId);
+                };
+
+                const toggleSecondOrder = (childId) => {
+                    setDraftSelected(prev => {
+                        const next = { ...prev };
+                        const opt = activeCat.options.find(o => o.id === activeOptId);
+                        const children = opt ? opt.children : [];
+                        let current = next[activeOptId];
+                        if (!current) {
+                            next[activeOptId] = new Set([childId]);
+                        } else if (current === "all") {
+                            const s = new Set(children);
+                            s.delete(childId);
+                            if (s.size === 0) delete next[activeOptId]; else next[activeOptId] = s;
+                        } else {
+                            const s = new Set(current);
+                            if (s.has(childId)) s.delete(childId); else s.add(childId);
+                            if (s.size === 0) delete next[activeOptId];
+                            else if (s.size === children.length) next[activeOptId] = "all";
+                            else next[activeOptId] = s;
+                        }
+                        return next;
+                    });
+                };
+
+                const handleSave = () => {
+                    if (!canSave) return;
+                    onSave(activeCatId, draftRule, draftSelected);
+                    onClose();
+                };
+
+                const handleDelete = () => {
+                    onDelete(activeCatId);
+                    onClose();
+                };
+
+                /* shared styles */
+                const itemRowStyle = {
+                    display: "flex", alignItems: "center", gap: 12, padding: 8,
+                    borderRadius: 6, cursor: "pointer", transition: "background .1s",
+                };
+                const footerStyle = {
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "12px 20px", borderTop: "1px solid var(--color-border-default)",
+                    background: "var(--color-bg-secondary)", flexShrink: 0,
+                };
+                const footerTextBase = { fontSize: 14, fontWeight: 500, cursor: "pointer" };
+
+                /* ─── Footer bar ─── */
+                const footer = (
+                    <div style={footerStyle}>
+                        <span onClick={onClose}
+                            style={{ ...footerTextBase, color: "var(--color-text-subtlest)" }}>Cancel</span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            {isEditing && (
+                                <span onClick={handleDelete}
+                                    style={{ ...footerTextBase, color: "var(--color-text-danger)" }}>Delete</span>
+                            )}
+                            <span onClick={canSave ? handleSave : undefined}
+                                style={{
+                                    ...footerTextBase,
+                                    color: "var(--color-text-information)",
+                                    opacity: canSave ? 1 : 0.35,
+                                    cursor: canSave ? "pointer" : "default",
+                                }}>Save</span>
+                        </div>
+                    </div>
+                );
+
+                /* ═══ RENDER ═══ */
+                return (
+                    <div ref={popRef} className="filter-dropdown" style={{
+                        position: "absolute", top: "calc(100% + 4px)", left: nudge, zIndex: 25,
+                        width: 380, background: "var(--color-bg-primary)",
+                        borderRadius: 12, boxShadow: "var(--shadow-overlay)",
+                        border: "1px solid var(--color-border-default)",
+                        overflow: "hidden", display: "flex", flexDirection: "column",
+                        maxHeight: maxH,
+                    }}>
+                        {/* ─── SCREEN: Categories ─── */}
+                        {screen === "categories" && (
+                            <>
+                                <div style={{
+                                    display: "flex", alignItems: "center", padding: "0 20px", height: 48,
+                                    borderBottom: "1px solid var(--color-border-default)", flexShrink: 0,
+                                }}>
+                                    <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-default)" }}>Filter by...</span>
+                                </div>
+                                <div style={{ padding: "24px 20px", display: "flex", flexDirection: "column", gap: 12, overflowY: "auto", flex: 1 }}>
+                                    <FilterSearch value={catSearch} onChange={setCatSearch} />
+                                    <div style={{ display: "flex", flexDirection: "column" }}>
+                                        {FILTER_CATEGORIES
+                                            .filter(c => c.label.toLowerCase().includes(catSearch.toLowerCase()))
+                                            .map(cat => (
+                                                <div key={cat.id} onClick={() => {
+                                                    setActiveCatId(cat.id);
+                                                    setScreen("first-order");
+                                                    setFoSearch("");
+                                                }} style={{ ...itemRowStyle, gap: 8 }}
+                                                onMouseEnter={e => e.currentTarget.style.background = "var(--color-bg-secondary)"}
+                                                onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                                                    <span style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-default)" }}>{cat.label}</span>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </div>
+                                {footer}
+                            </>
+                        )}
+
+                        {/* ─── SCREEN: First-order ─── */}
+                        {screen === "first-order" && activeCat && (
+                            <>
+                                <div style={{
+                                    display: "flex", alignItems: "center", padding: "0 20px", height: 48,
+                                    borderBottom: "1px solid var(--color-border-default)", flexShrink: 0,
+                                }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-default)" }}>{activeCat.label}</span>
+                                        <div style={{ position: "relative" }}>
+                                            <div onClick={() => setShowRuleMenu(!showRuleMenu)} style={{
+                                                display: "inline-flex", alignItems: "center", gap: 4,
+                                                padding: "1px 8px", borderRadius: 4, cursor: "pointer",
+                                                background: "var(--color-bg-accent-blue-subtlest)",
+                                                border: "1px solid var(--color-bg-accent-blue-subtle)",
+                                            }}>
+                                                <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-selected)" }}>{draftRule}</span>
+                                                <Icon name="chevronDown" size={14} color="var(--color-text-selected)" />
+                                            </div>
+                                            {showRuleMenu && (
+                                                <RuleDropdown
+                                                    rules={activeCat.rules}
+                                                    current={draftRule}
+                                                    onSelect={(r) => { setDraftRule(r); setShowRuleMenu(false); }}
+                                                    onClose={() => setShowRuleMenu(false)}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{ padding: "24px 20px", display: "flex", flexDirection: "column", gap: 12, overflowY: "auto", flex: 1 }}>
+                                    <FilterSearch value={foSearch} onChange={setFoSearch} />
+                                    <div style={{ display: "flex", flexDirection: "column" }}>
+                                        {activeCat.options
+                                            .filter(o => o.label.toLowerCase().includes(foSearch.toLowerCase()))
+                                            .map(opt => {
+                                                const checked = isFirstOrderChecked(opt.id);
+                                                const indeterminate = isFirstOrderIndeterminate(opt.id);
+                                                const hasChildren = opt.children && opt.children.length > 0;
+                                                return (
+                                                    <div key={opt.id} style={{ ...itemRowStyle, cursor: hasChildren ? "pointer" : "default" }}
+                                                        onMouseEnter={e => e.currentTarget.style.background = "var(--color-bg-secondary)"}
+                                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                                        onClick={hasChildren ? () => {
+                                                            setActiveOptId(opt.id);
+                                                            setScreen("second-order");
+                                                            setSoSearch("");
+                                                        } : undefined}>
+                                                        <Checkbox checked={checked && !indeterminate} indeterminate={indeterminate}
+                                                            onChange={() => toggleFirstOrder(opt.id)} size={20} />
+                                                        <span style={{
+                                                            flex: 1, fontSize: 14, fontWeight: 500,
+                                                            color: "var(--color-text-default)", minWidth: 0,
+                                                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                                        }}>{opt.label}</span>
+                                                        {hasChildren && (
+                                                            <div style={{
+                                                                display: "flex", alignItems: "center",
+                                                                color: "var(--color-icon-subtle)",
+                                                                padding: "2px",
+                                                            }}>
+                                                                <Icon name="chevron-right" size={16} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+                                </div>
+                                {footer}
+                            </>
+                        )}
+
+                        {/* ─── SCREEN: Second-order ─── */}
+                        {screen === "second-order" && activeCat && activeOpt && (
+                            <>
+                                <div style={{
+                                    display: "flex", alignItems: "center", padding: "0 20px", height: 48,
+                                    borderBottom: "1px solid var(--color-border-default)", flexShrink: 0,
+                                }}>
+                                    <button onClick={() => { setScreen("first-order"); setActiveOptId(null); }} style={{
+                                        display: "inline-flex", alignItems: "center", gap: 6,
+                                        padding: 0, cursor: "pointer",
+                                        border: "none",
+                                        background: "none", fontSize: 14,
+                                        fontWeight: 500, color: "var(--color-text-default)",
+                                    }}>
+                                        <Icon name="arrow-left" size={14} /> Back
+                                    </button>
+                                </div>
+                                <div style={{ padding: "24px 20px", display: "flex", flexDirection: "column", gap: 12, overflowY: "auto", flex: 1 }}>
+                                    <FilterSearch value={soSearch} onChange={setSoSearch} />
+                                    <div style={{ display: "flex", flexDirection: "column" }}>
+                                        {activeOpt.children
+                                            .filter(c => c.toLowerCase().includes(soSearch.toLowerCase()))
+                                            .map(child => (
+                                                <div key={child} style={{ ...itemRowStyle, cursor: "default" }}
+                                                    onMouseEnter={e => e.currentTarget.style.background = "var(--color-bg-secondary)"}
+                                                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                                                    <Checkbox checked={isSecondOrderChecked(child)}
+                                                        onChange={() => toggleSecondOrder(child)} size={20} />
+                                                    <span style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-default)" }}>{child}</span>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </div>
+                                {footer}
+                            </>
+                        )}
+                    </div>
+                );
+            }
+
+            /* ─── format pill label ───────────────────────────────── */
+            function formatFilterLabel(filter) {
+                const cat = FILTER_CATEGORIES.find(c => c.id === filter.categoryId);
+                const label = cat ? cat.label : filter.categoryId;
+                if (filter.rule === "is empty") return `${label}: empty`;
+                if (filter.rule === "is not empty") return `${label}: not empty`;
+                const keys = Object.keys(filter.selected);
+                if (keys.length === 0) return label;
+                const rulePrefix = filter.rule === "is not" ? "not " : "";
+                /* expand parents with children into their individual sub-names */
+                const allNames = [];
+                for (const optId of keys) {
+                    const opt = cat ? cat.options.find(o => o.id === optId) : null;
+                    const sel = filter.selected[optId];
+                    if (opt && opt.children && opt.children.length > 0 && sel !== "all") {
+                        /* partially selected — show child names */
+                        const childNames = sel instanceof Set ? [...sel] : Array.isArray(sel) ? sel : [];
+                        allNames.push(...childNames);
+                    } else {
+                        allNames.push(optId);
+                    }
+                }
+                const display = allNames.slice(0, 3).join(", ");
+                const overflow = allNames.length > 3 ? ` +${allNames.length - 3}` : "";
+                return `${label}: ${rulePrefix}${display}${overflow}`;
+            }
+
+            /* ─── FilterBar ───────────────────────────────────────── */
+            function FilterBar({ filters, onUpdateFilter, onRemoveFilter }) {
+                const [popoverOpen, setPopoverOpen] = useState(false);
+                const [editingCatId, setEditingCatId] = useState(null);
+
+                /* find the filter for the currently-open category */
+                const editingFilter = editingCatId ? filters.find(f => f.categoryId === editingCatId) : null;
+
+                const handleSave = (categoryId, rule, selected) => {
+                    onUpdateFilter(categoryId, rule, selected);
+                };
+
+                const handleDelete = (categoryId) => {
+                    onRemoveFilter(categoryId);
+                };
+
+                const closePopover = () => { setPopoverOpen(false); setEditingCatId(null); };
+
+                const openNew = () => {
+                    setEditingCatId(null);
+                    setPopoverOpen(true);
+                };
+
+                const openEdit = (catId) => {
+                    setEditingCatId(catId);
+                    setPopoverOpen(true);
+                };
+
+                /* decide where to anchor the popover:
+                   – if editing a category that has a pill → render inside that pill wrapper
+                   – otherwise (new filter, no pill yet) → render inside the add-button wrapper */
+                const popoverOnPill = popoverOpen && editingCatId && filters.some(f => f.categoryId === editingCatId);
+                const popoverOnAdd = popoverOpen && !popoverOnPill;
+
+                const popoverEl = (
+                    <FilterPopover
+                        isOpen={popoverOpen}
+                        onClose={closePopover}
+                        filter={editingFilter}
+                        categoryId={editingCatId}
+                        onSave={handleSave}
+                        onDelete={handleDelete}
+                    />
+                );
 
                 return (
                     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
-                        {filters.map((f, i) => (
-                            <FilterPill key={f.field} filter={f}
-                                onRemove={() => onRemoveFilter(i)}
-                                onUpdate={(vals) => onUpdateFilter(i, vals)} />
+                        {filters.map((f) => (
+                            <div key={f.categoryId} style={{ display: "flex", alignItems: "center", gap: 2, position: "relative" }}>
+                                <div className="filter-pill" onClick={() => openEdit(f.categoryId)} style={{
+                                    display: "flex", alignItems: "center", gap: 4,
+                                    padding: "6px 10px 6px 12px", borderRadius: 8,
+                                    border: "1.5px solid var(--color-bg-accent-blue-subtle)",
+                                    background: "var(--color-bg-accent-blue-subtlest)",
+                                    cursor: "pointer", fontSize: 13, fontWeight: 500,
+                                    color: "var(--color-text-selected)",
+                                    maxWidth: 280, overflow: "hidden",
+                                }}>
+                                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {formatFilterLabel(f)}
+                                    </span>
+                                    <Icon name="chevronDown" size={14} color="var(--color-text-selected)" />
+                                </div>
+                                {popoverOnPill && editingCatId === f.categoryId && popoverEl}
+                            </div>
                         ))}
-                        <div ref={addRef} style={{ position: "relative" }}>
-                            <button onClick={() => setShowAddMenu(!showAddMenu)} style={{
+                        <div style={{ position: "relative" }}>
+                            <button onClick={openNew} style={{
                                 display: "flex", alignItems: "center", gap: 4,
                                 padding: "6px 12px", borderRadius: 8,
                                 border: "1.5px solid var(--color-border-default)",
@@ -590,110 +1123,12 @@
                             }}>
                                 Add filter <Icon name="plus" size={14} />
                             </button>
-                            {showAddMenu && availableFields.length > 0 && (
-                                <div className="filter-dropdown" style={{
-                                    position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20,
-                                    background: "var(--color-elevation-surface)", borderRadius: 10,
-                                    boxShadow: "var(--shadow-overlay)", minWidth: 180,
-                                    border: "1px solid var(--color-border-default)",
-                                    padding: "4px 0",
-                                }}>
-                                    {availableFields.map(field => (
-                                        <div key={field} onClick={() => {
-                                            onAddFilter({ field, values: [] });
-                                            setShowAddMenu(false);
-                                        }} style={{
-                                            padding: "8px 14px", cursor: "pointer", fontSize: 13,
-                                            fontWeight: 500, color: "var(--color-text-default)",
-                                            transition: "background .1s",
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.background = "var(--color-bg-secondary)"}
-                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                                            {field}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            {popoverOnAdd && popoverEl}
                         </div>
                         {filters.length === 0 && (
                             <span style={{ fontSize: 13, color: "var(--color-text-subtle)", marginLeft: 4 }}>
                                 Apply filters to find exactly what you're looking for.
                             </span>
-                        )}
-                    </div>
-                );
-            }
-
-            /* ─── FilterPill ──────────────────────────────────────── */
-            function FilterPill({ filter, onRemove, onUpdate }) {
-                const [open, setOpen] = useState(false);
-                const ref = useRef(null);
-
-                useEffect(() => {
-                    if (!open) return;
-                    const handler = (e) => {
-                        if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-                    };
-                    document.addEventListener("mousedown", handler);
-                    return () => document.removeEventListener("mousedown", handler);
-                }, [open]);
-
-                const options = FILTER_OPTIONS[filter.field] || [];
-                const label = filter.values.length > 0 ? filter.values.join(", ") : "Any";
-
-                return (
-                    <div ref={ref} style={{ position: "relative" }}>
-                        <div className="filter-pill" onClick={() => setOpen(!open)} style={{
-                            display: "flex", alignItems: "center", gap: 4,
-                            padding: "6px 10px 6px 12px", borderRadius: 8,
-                            border: "1.5px solid var(--color-bg-accent-blue-subtle)",
-                            background: "var(--color-bg-accent-blue-subtlest)",
-                            cursor: "pointer", fontSize: 13, fontWeight: 500,
-                            color: "var(--color-text-selected)",
-                        }}>
-                            <span>{filter.field}: {label}</span>
-                            <Icon name="chevronDown" size={14} color="var(--color-text-selected)" />
-                        </div>
-                        {open && (
-                            <div className="filter-dropdown" style={{
-                                position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20,
-                                background: "var(--color-elevation-surface)", borderRadius: 10,
-                                boxShadow: "var(--shadow-overlay)", minWidth: 200,
-                                border: "1px solid var(--color-border-default)",
-                                padding: "4px 0",
-                            }}>
-                                {options.map(opt => {
-                                    const selected = filter.values.includes(opt);
-                                    return (
-                                        <div key={opt} onClick={() => {
-                                            const next = selected
-                                                ? filter.values.filter(v => v !== opt)
-                                                : [...filter.values, opt];
-                                            onUpdate(next);
-                                        }} style={{
-                                            padding: "8px 14px", cursor: "pointer", fontSize: 13,
-                                            fontWeight: 500, display: "flex", alignItems: "center", gap: 8,
-                                            color: "var(--color-text-default)",
-                                            transition: "background .1s",
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.background = "var(--color-bg-secondary)"}
-                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                                            <Checkbox checked={selected} onChange={() => {}} size={16} />
-                                            {opt}
-                                        </div>
-                                    );
-                                })}
-                                <div style={{ borderTop: "1px solid var(--color-border-default)", margin: "4px 0" }} />
-                                <div onClick={() => { onRemove(); setOpen(false); }} style={{
-                                    padding: "8px 14px", cursor: "pointer", fontSize: 13,
-                                    fontWeight: 500, color: "#D14D41",
-                                    transition: "background .1s",
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.background = "var(--color-bg-secondary)"}
-                                onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                                    Remove filter
-                                </div>
-                            </div>
                         )}
                     </div>
                 );
@@ -1315,12 +1750,18 @@
                 const filteredItems = useMemo(() => {
                     let result = [...ITEMS];
 
-                    // active filters
                     for (const f of filters) {
-                        if (f.values.length === 0) continue;
-                        if (f.field === "Region") result = result.filter(i => f.values.includes(i.region));
-                        if (f.field === "Category") result = result.filter(i => f.values.includes(i.category));
-                        if (f.field === "Custom Tag") result = result.filter(i => i.tags.some(t => f.values.includes(t)));
+                        const cat = FILTER_CATEGORIES.find(c => c.id === f.categoryId);
+                        if (!cat) continue;
+
+                        if (f.rule === "is empty") { result = result.filter(item => !getFieldValue(item, cat.field)); continue; }
+                        if (f.rule === "is not empty") { result = result.filter(item => !!getFieldValue(item, cat.field)); continue; }
+
+                        const selectedValues = flattenSelections(f.selected, cat);
+                        if (selectedValues.length === 0) continue;
+
+                        if (f.rule === "is") result = result.filter(item => matchesFilter(item, cat.field, selectedValues));
+                        if (f.rule === "is not") result = result.filter(item => !matchesFilter(item, cat.field, selectedValues));
                     }
 
                     // search
@@ -1332,7 +1773,6 @@
                         );
                     }
 
-                    // sort by name
                     result.sort((a, b) => a.name.localeCompare(b.name));
                     return result;
                 }, [filters, searchQuery]);
@@ -1364,14 +1804,33 @@
                 const selectedItems = ITEMS.filter(i => selectedIds.has(i.id));
 
                 const activeRegions = useMemo(() => {
-                    const rf = filters.find(f => f.field === "Region");
-                    return rf && rf.values.length > 0 ? rf.values : [];
+                    const rf = filters.find(f => f.categoryId === "region");
+                    if (!rf || rf.rule === "is empty" || rf.rule === "is not empty") return [];
+                    const regionCat = FILTER_CATEGORIES.find(c => c.id === "region");
+                    const vals = flattenSelections(rf.selected, regionCat);
+                    if (rf.rule === "is") return vals;
+                    /* "is not" — return all regions EXCEPT selected */
+                    const allRegions = [...new Set(ITEMS.map(i => i.region))];
+                    return allRegions.filter(r => !vals.includes(r));
                 }, [filters]);
 
-                const addFilter = useCallback((f) => setFilters(prev => [...prev, f]), []);
-                const removeFilter = useCallback((idx) => setFilters(prev => prev.filter((_, i) => i !== idx)), []);
-                const updateFilter = useCallback((idx, values) => {
-                    setFilters(prev => prev.map((f, i) => i === idx ? { ...f, values } : f));
+                /* live-apply: create or update filter by categoryId */
+                const updateFilter = useCallback((categoryId, rule, selected) => {
+                    setFilters(prev => {
+                        const idx = prev.findIndex(f => f.categoryId === categoryId);
+                        /* if nothing selected and rule doesn't stand alone, remove */
+                        const isEmpty = Object.keys(selected).length === 0
+                            && rule !== "is empty" && rule !== "is not empty";
+                        if (isEmpty) {
+                            return idx >= 0 ? prev.filter((_, i) => i !== idx) : prev;
+                        }
+                        const entry = { categoryId, rule, selected };
+                        if (idx >= 0) return prev.map((f, i) => i === idx ? entry : f);
+                        return [...prev, entry];
+                    });
+                }, []);
+                const removeFilter = useCallback((categoryId) => {
+                    setFilters(prev => prev.filter(f => f.categoryId !== categoryId));
                 }, []);
 
                 return (
@@ -1422,9 +1881,8 @@
                                     <SearchBar value={searchQuery} onChange={setSearchQuery} />
                                     <FilterBar
                                         filters={filters}
-                                        onAddFilter={addFilter}
-                                        onRemoveFilter={removeFilter}
                                         onUpdateFilter={updateFilter}
+                                        onRemoveFilter={removeFilter}
                                     />
                                 </div>
                             </div>
