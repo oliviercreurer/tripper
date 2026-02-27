@@ -1892,14 +1892,7 @@
                                 <AnimateOnce key="search"
                                     animation="panelFadeIn .3s cubic-bezier(.2,0,0,1) both"
                                     style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
-                                    <div style={{ padding: "32px 32px 24px", flexShrink: 0 }}>
-                                        <p style={{
-                                            fontSize: 16, color: "var(--color-text-subtle)",
-                                            lineHeight: "24px", margin: "0 0 24px 0",
-                                        }}>
-                                            Search within your account or across Whereabouts' extensive database of
-                                            tourism businesses, organizations, and points of interest.
-                                        </p>
+                                    <div style={{ padding: "24px 32px 20px", flexShrink: 0 }}>
                                         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                                             <SearchBar value={searchQuery} onChange={setSearchQuery} />
                                             <FilterBar
@@ -1925,14 +1918,6 @@
                                 <AnimateOnce key="selections"
                                     animation="panelFadeIn .3s cubic-bezier(.2,0,0,1) both"
                                     style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
-                                    <div style={{ padding: "32px 32px 24px", flexShrink: 0 }}>
-                                        <p style={{
-                                            fontSize: 16, color: "var(--color-text-subtle)",
-                                            lineHeight: "24px", margin: 0,
-                                        }}>
-                                            All the selections you've made throughout your current search.
-                                        </p>
-                                    </div>
                                     <SelectionsList
                                         items={selectedItems}
                                         onRemove={toggleItem}
