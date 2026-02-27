@@ -230,6 +230,18 @@
                 from { opacity: 0; transform: translateY(24px); }
                 to   { opacity: 1; transform: translateY(0); }
             }
+            @keyframes cartBarOut {
+                from { opacity: 1; transform: translateY(0); }
+                to   { opacity: 0; transform: translateY(24px); }
+            }
+            @keyframes cartLabelUp {
+                from { opacity: 0; transform: translateY(100%); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes cartLabelDown {
+                from { opacity: 1; transform: translateY(0); }
+                to   { opacity: 0; transform: translateY(-100%); }
+            }
             /* ─── Panel crossfade ────────────────────────────────── */
             @keyframes panelFadeIn {
                 from { opacity: 0; transform: translateY(12px); }
@@ -542,11 +554,23 @@
                 POI:      "#8b7ec8",
                 Area:     "#3aa99f",
             };
-            /* darker variants for map markers/labels in light mode */
+            /* darker variants for map marker strokes in light mode */
             const TYPE_MAP = {
                 Business: "#a07a0e",
                 POI:      "#6b5da6",
                 Area:     "#2d847c",
+            };
+            /* lighter fills for map markers (light mode) */
+            const TYPE_MAP_FILL = {
+                Business: "#f0d97a",
+                POI:      "#c4b8e8",
+                Area:     "#7ed4cb",
+            };
+            /* darker fills for map markers (dark mode) — lets bright borders pop */
+            const TYPE_DOT_FILL = {
+                Business: "#5c4408",
+                POI:      "#352a5c",
+                Area:     "#1a4a44",
             };
 
             /* ─── Filter popover search input ─────────────────────── */
@@ -1296,16 +1320,44 @@
 
             /* ─── CartBar (floating inside explorer panel) ────────── */
             function CartBar({ count, panelMode, onToggleMode, allChecked, onToggleAll }) {
-                if (count === 0) return null;
+                const [visible, setVisible] = useState(false);
+                const [exiting, setExiting] = useState(false);
+                const prevCount = useRef(count);
+                const barRef = useRef(null);
+
+                /* track enter / exit */
+                useEffect(() => {
+                    if (count > 0 && !visible) {
+                        setExiting(false);
+                        setVisible(true);
+                    } else if (count === 0 && visible) {
+                        setExiting(true);
+                    }
+                    prevCount.current = count;
+                }, [count]);
+
+                /* remove from DOM after exit animation */
+                const handleAnimEnd = (e) => {
+                    if (exiting && e.animationName === "cartBarOut") {
+                        setVisible(false);
+                        setExiting(false);
+                    }
+                };
+
+                const isSelections = panelMode === "selections";
+
+                if (!visible) return null;
 
                 return (
-                    <div style={{
+                    <div ref={barRef} onAnimationEnd={handleAnimEnd} style={{
                         position: "absolute", bottom: 40, left: 36, right: 36,
                         zIndex: 5, pointerEvents: "auto",
                         background: "var(--color-bg-accent-blue-subtler, #c6dde8)",
                         border: "2px solid var(--color-border-selected, #205ea6)",
                         borderRadius: 16, padding: 16,
-                        animation: "cartBarIn .35s cubic-bezier(.2,0,0,1) both",
+                        animation: exiting
+                            ? "cartBarOut .3s cubic-bezier(.2,0,0,1) both"
+                            : "cartBarIn .35s cubic-bezier(.2,0,0,1) both",
                         display: "flex", alignItems: "center", justifyContent: "space-between",
                         overflow: "hidden",
                     }}>
@@ -1317,22 +1369,35 @@
                             }}>{count} selection{count !== 1 ? "s" : ""}</span>
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                            {panelMode === "selections" && (
+                            <div style={{
+                                overflow: "hidden", height: 32,
+                                position: "relative", width: 108,
+                            }}>
+                                {/* Review label */}
+                                <span onClick={!isSelections ? onToggleMode : undefined} style={{
+                                    position: "absolute", left: 0, top: 0, width: "100%", height: 32,
+                                    display: "inline-flex", alignItems: "center", justifyContent: "flex-end",
+                                    fontSize: 14, fontWeight: 500,
+                                    color: "var(--color-text-default)",
+                                    cursor: !isSelections ? "pointer" : "default",
+                                    transform: isSelections ? "translateY(-100%)" : "translateY(0)",
+                                    opacity: isSelections ? 0 : 1,
+                                    transition: "transform .25s cubic-bezier(.2,0,0,1), opacity .25s cubic-bezier(.2,0,0,1)",
+                                }}>Review</span>
+                                {/* Add to Day 1 button */}
                                 <button onClick={() => alert("Items added to Day 1!")} style={{
-                                    padding: "0 12px", borderRadius: 8, height: 32,
+                                    position: "absolute", right: 0, top: 0, height: 32,
+                                    padding: "0 12px", borderRadius: 8,
                                     border: "1px solid var(--color-border-selected, #205ea6)",
                                     background: "var(--color-bg-selected-bold, #205ea6)",
                                     cursor: "pointer", fontSize: 14, fontWeight: 500,
                                     color: "var(--color-text-inverse, #FFFDF6)",
+                                    whiteSpace: "nowrap",
+                                    transform: isSelections ? "translateY(0)" : "translateY(100%)",
+                                    opacity: isSelections ? 1 : 0,
+                                    transition: "transform .25s cubic-bezier(.2,0,0,1), opacity .25s cubic-bezier(.2,0,0,1)",
                                 }}>Add to Day 1</button>
-                            )}
-                            {panelMode === "search" && (
-                                <span onClick={onToggleMode} style={{
-                                    fontSize: 14, fontWeight: 500,
-                                    color: "var(--color-text-default)",
-                                    cursor: "pointer",
-                                }}>Review</span>
-                            )}
+                            </div>
                             <button onClick={onToggleMode} style={{
                                 width: 32, height: 32, borderRadius: 8,
                                 border: "1px solid var(--color-border-selected)",
@@ -1504,7 +1569,7 @@
                                 "text-max-width": 10,
                             },
                             paint: {
-                                "text-color": ["get", "color"],
+                                "text-color": ["get", "labelColor"],
                                 "text-halo-color": "#ffffff",
                                 "text-halo-width": 1.5,
                                 "text-emissive-strength": 1,
@@ -1546,17 +1611,22 @@
 
                         /* populate initial markers from current data */
                         const { items: itms, selectedIds: sel, activeRegions: ar, isDark: dk } = dataRef.current;
-                        const mc = dk ? TYPE_DOT : TYPE_MAP;
-                        const feats = itms.map(item => ({
-                            type: "Feature",
-                            geometry: { type: "Point", coordinates: [item.lng, item.lat] },
-                            properties: {
-                                id: item.id, name: item.name, category: item.category,
-                                selected: sel.has(item.id),
-                                color: sel.has(item.id) ? "#205EA6" : (item.category === "Provincial Park" ? mc.Area : (item.type === "POI" ? mc.POI : mc.Business)),
-                                stroke: sel.has(item.id) ? "#205EA6" : (item.category === "Provincial Park" ? mc.Area : (item.type === "POI" ? mc.POI : mc.Business)),
-                            },
-                        }));
+                        const sc = dk ? TYPE_DOT : TYPE_MAP;
+                        const fc = dk ? TYPE_DOT_FILL : TYPE_MAP_FILL;
+                        const feats = itms.map(item => {
+                            const t = item.category === "Provincial Park" ? "Area" : (item.type === "POI" ? "POI" : "Business");
+                            return {
+                                type: "Feature",
+                                geometry: { type: "Point", coordinates: [item.lng, item.lat] },
+                                properties: {
+                                    id: item.id, name: item.name, category: item.category,
+                                    selected: sel.has(item.id),
+                                    color: sel.has(item.id) ? "#205EA6" : fc[t],
+                                    stroke: sel.has(item.id) ? "#205EA6" : sc[t],
+                                    labelColor: sel.has(item.id) ? "#205EA6" : sc[t],
+                                },
+                            };
+                        });
                         map.getSource("explorer-points").setData({ type: "FeatureCollection", features: feats });
 
                         /* populate initial region polygons if any are active */
@@ -1612,9 +1682,11 @@
                     const src = map.getSource("explorer-points");
                     if (!src) return;
                     const { items: itms, selectedIds: sel, isDark: dk } = dataRef.current;
-                    const mc = dk ? TYPE_DOT : TYPE_MAP;
+                    const sc = dk ? TYPE_DOT : TYPE_MAP;
+                    const fc = dk ? TYPE_DOT_FILL : TYPE_MAP_FILL;
                     const features = itms.map(item => {
                         const isSel = sel.has(item.id);
+                        const t = item.category === "Provincial Park" ? "Area" : (item.type === "POI" ? "POI" : "Business");
                         return {
                             type: "Feature",
                             geometry: { type: "Point", coordinates: [item.lng, item.lat] },
@@ -1623,8 +1695,9 @@
                                 name: item.name,
                                 category: item.category,
                                 selected: isSel,
-                                color: isSel ? "#205EA6" : (item.category === "Provincial Park" ? mc.Area : (item.type === "POI" ? mc.POI : mc.Business)),
-                                stroke: isSel ? "#205EA6" : (item.category === "Provincial Park" ? mc.Area : (item.type === "POI" ? mc.POI : mc.Business)),
+                                color: isSel ? "#205EA6" : fc[t],
+                                stroke: isSel ? "#205EA6" : sc[t],
+                                labelColor: isSel ? "#205EA6" : sc[t],
                             },
                         };
                     });
@@ -1860,6 +1933,13 @@
                                     }}>{panelMode === "search" ? "Explorer" : "My Selections"}</h1>
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <button onClick={toggleDark} style={{
+                                        background: "none", border: "none", cursor: "pointer",
+                                        padding: 4, borderRadius: 8, color: "var(--color-icon-subtle)",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                    }}>
+                                        <Icon name={isDark ? "sun" : "moon"} size={18} />
+                                    </button>
                                     {panelMode === "selections" ? (
                                         <button onClick={() => setPanelMode("search")} style={{
                                             padding: "0 12px", borderRadius: 8, height: 32,
@@ -1877,13 +1957,6 @@
                                             color: "var(--color-text-default)",
                                         }}>Close</button>
                                     )}
-                                    <button onClick={toggleDark} style={{
-                                        background: "none", border: "none", cursor: "pointer",
-                                        padding: 4, borderRadius: 8, color: "var(--color-icon-subtle)",
-                                        display: "flex", alignItems: "center", justifyContent: "center",
-                                    }}>
-                                        <Icon name={isDark ? "sun" : "moon"} size={18} />
-                                    </button>
                                 </div>
                             </div>
 
