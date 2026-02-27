@@ -225,103 +225,15 @@
             .filter-pill:hover {
                 border-color: var(--color-border-bold);
             }
-            /* ─── Floating cart overlay ─────────────────────────── */
-            .cart-scrim {
-                position: absolute;
-                inset: 0;
-                background: var(--color-bg-primary);
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity .3s ease;
-                z-index: 19;
-            }
-            .cart-scrim.active {
-                opacity: .55;
-                pointer-events: auto;
-            }
-            .cart-overlay {
-                position: absolute;
-                bottom: 64px; left: 50%;
-                transform: translateX(-50%);
-                width: 764px;
-                max-width: 90%;
-                z-index: 20;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                pointer-events: none;
-                transition: opacity .3s ease;
-            }
-            .cart-overlay > * {
-                pointer-events: auto;
-            }
-            /* ─ Drawer (narrower than bar, 16px inset each side) ─ */
-            .cart-drawer {
-                width: calc(100% - 32px);
-                overflow: hidden;
-                transition: max-height .25s cubic-bezier(.4, 0, .2, 1),
-                            opacity .2s ease;
-            }
-            .cart-drawer.closed {
-                max-height: 0;
-                opacity: 0;
-            }
-            .cart-drawer.open {
-                max-height: calc(100vh - 64px - 64px - 80px);
-                opacity: 1;
-            }
-            .cart-card {
-                background: var(--color-bg-primary);
-                border: 1px solid var(--color-border-default);
-                border-radius: 16px 16px 0 0;
-                box-shadow: 0 2px 20px rgba(0,0,0,.04);
-                padding: 24px 24px 32px;
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-            }
-            .cart-inner {
-                background: var(--color-bg-secondary);
-                border: 1px solid var(--color-border-default);
-                border-radius: 12px;
-                overflow: hidden;
-            }
-            .cart-card-scroll {
-                max-height: calc(100vh - 64px - 64px - 200px);
-                overflow-y: auto;
-            }
-            .cart-item {
-                display: flex; align-items: center; gap: 32px;
-                padding: 16px 20px;
-                border-bottom: 1px solid var(--color-border-default);
-            }
-            .cart-item:last-child {
-                border-bottom: none;
-            }
-            .cart-item:hover {
-                background: var(--color-bg-neutral-subtler);
-            }
-            @keyframes cartItemIn {
-                from { opacity: 0; transform: translateY(12px); }
+            /* ─── Cart bar animation ─────────────────────────── */
+            @keyframes cartBarIn {
+                from { opacity: 0; transform: translateY(24px); }
                 to   { opacity: 1; transform: translateY(0); }
             }
-            /* ─ Blue bar ─ */
-            .cart-bar {
-                background: var(--color-bg-selected-bold);
-                border-radius: 16px;
-                width: 100%;
-                transition: transform .3s cubic-bezier(.4, 0, .2, 1), opacity .3s ease;
-            }
-            .cart-bar.hidden {
-                transform: translateY(100%);
-                opacity: 0;
-                pointer-events: none;
-            }
-            .selection-card {
-                transition: background .15s ease;
-            }
-            .selection-card:hover {
-                background: var(--color-bg-neutral-subtler);
+            /* ─── Panel crossfade ────────────────────────────────── */
+            @keyframes panelFadeIn {
+                from { opacity: 0; transform: translateY(12px); }
+                to   { opacity: 1; transform: translateY(0); }
             }
             .filter-dropdown {
                 animation: dropdownIn .15s ease;
@@ -563,6 +475,11 @@
                     "arrow-left": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
                     "chevron-right": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 6 15 12 9 18"/></svg>,
                     minus: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+                    "chevron-up": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"/></svg>,
+                    "chevron-down": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
+                    "minus-circle": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>,
+                    "check-circle": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+                    "book-open": <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
                 };
                 return icons[name] || null;
             };
@@ -685,8 +602,23 @@
                 );
             }
 
+            /* ─── AnimateOnce — plays a CSS animation on mount, then removes it ── */
+            function AnimateOnce({ animation, style, children, ...props }) {
+                const ref = useRef(null);
+                const mounted = useRef(false);
+                useEffect(() => {
+                    const el = ref.current;
+                    if (!el || mounted.current) return;
+                    mounted.current = true;
+                    el.style.animation = animation;
+                    const onEnd = () => { el.style.animation = "none"; el.removeEventListener("animationend", onEnd); };
+                    el.addEventListener("animationend", onEnd);
+                }, []);
+                return <div ref={ref} style={style} {...props}>{children}</div>;
+            }
+
             /* ─── FilterPopover ───────────────────────────────────── */
-            function FilterPopover({ isOpen, onClose, filter, categoryId, onSave, onDelete }) {
+            function FilterPopover({ isOpen, onClose, filter, categoryId, onSave, onDelete, cartVisible }) {
                 /*
                  * Draft-then-save model: selections are local until Save is clicked.
                  * filter = existing filter object (editing) or null (creating new).
@@ -757,7 +689,8 @@
                         el.style.left = shift + "px";
                         setNudge(shift);
                         /* vertical clamping — cap height so footer stays on-screen */
-                        const available = window.innerHeight - pop.top - margin;
+                        const cartReserve = cartVisible ? 120 : 0; /* cart bar height + bottom offset */
+                        const available = window.innerHeight - pop.top - margin - cartReserve;
                         setMaxH(Math.max(200, available));
                     });
                     return () => cancelAnimationFrame(id);
@@ -1048,7 +981,7 @@
             }
 
             /* ─── FilterBar ───────────────────────────────────────── */
-            function FilterBar({ filters, onUpdateFilter, onRemoveFilter }) {
+            function FilterBar({ filters, onUpdateFilter, onRemoveFilter, cartVisible }) {
                 const [popoverOpen, setPopoverOpen] = useState(false);
                 const [editingCatId, setEditingCatId] = useState(null);
 
@@ -1089,6 +1022,7 @@
                         categoryId={editingCatId}
                         onSave={handleSave}
                         onDelete={handleDelete}
+                        cartVisible={cartVisible}
                     />
                 );
 
@@ -1232,6 +1166,8 @@
                                 No results match your filters.
                             </div>
                         )}
+                        {/* Bottom spacer for floating cart bar */}
+                        {items.length > 0 && <div style={{ height: 120 }} />}
                     </div>
                 );
             }
@@ -1249,119 +1185,164 @@
                 );
             }
 
-            /* ─── Cart (floating overlay) ─────────────────────────── */
-            function Cart({ selectedItems, onRemove, expanded, setExpanded }) {
-                const scrollRef = useRef(null);
-                const count = selectedItems.length;
-
-                // collapse when all items removed
-                useEffect(() => {
-                    if (count === 0) setExpanded(false);
-                }, [count]);
-
-                // scroll to bottom when items added
-                useEffect(() => {
-                    const el = scrollRef.current;
-                    if (el && expanded) {
-                        el.scrollTop = el.scrollHeight;
-                    }
-                }, [count, expanded]);
-
+            /* ─── SelectionsList ─────────────────────────────────── */
+            function SelectionsList({ items, onRemove, onRemoveAll, onOpenInfo }) {
                 return (
-                    <div className="cart-overlay" style={{
-                        opacity: count > 0 ? 1 : 0,
-                        pointerEvents: count > 0 ? "auto" : "none",
-                    }}>
-                        {/* Drawer — narrower than the bar, animates open/closed */}
-                        <div className={`cart-drawer ${expanded && count > 0 ? "open" : "closed"}`}>
-                            <div className="cart-card">
-                                <div style={{
-                                    fontSize: 14, fontWeight: 500,
-                                    color: "var(--color-text-default)",
-                                }}>
-                                    Items ({count})
-                                </div>
-                                <div className="cart-inner">
-                                    <div className="cart-card-scroll" ref={scrollRef}>
-                                        {selectedItems.map((item, i) => {
-                                            const c = TYPE_COLORS[item.type] || TYPE_COLORS.Business;
-                                            return (
-                                                <div key={item.id} className="cart-item"
-                                                    style={{ animation: "cartItemIn .25s cubic-bezier(.4,0,.2,1) both",
-                                                             animationDelay: `${Math.min(i * 0.03, 0.3)}s` }}>
-                                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                                        <div style={{ fontSize: 14, fontWeight: 600 }}>{item.name}</div>
-                                                    </div>
-                                                    <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                                                        <span style={{
-                                                            fontSize: 12, fontWeight: 500,
-                                                            color: "var(--color-text-subtlest)",
-                                                        }}>{item.category}</span>
-                                                        <div style={{
-                                                            width: 32, display: "flex",
-                                                            alignItems: "center", justifyContent: "center",
-                                                        }}>
-                                                            <div style={{
-                                                                width: 12, height: 12, borderRadius: 2,
-                                                                background: c.border,
-                                                                border: `1px solid ${c.text}`,
-                                                            }} />
-                                                        </div>
-                                                        <div onClick={() => onRemove(item.id)} style={{
-                                                            cursor: "pointer", display: "flex",
-                                                            alignItems: "center", justifyContent: "center",
-                                                            color: "var(--color-text-default)",
-                                                            transition: "opacity .15s ease",
-                                                        }}
-                                                        onMouseEnter={e => e.currentTarget.style.opacity = ".5"}
-                                                        onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
-                                                            <Icon name="circle-x" size={16} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
+                    <div style={{ flex: 1, overflow: "auto" }}>
+                        {/* Header */}
+                        <div style={{
+                            display: "flex", alignItems: "center", justifyContent: "space-between",
+                            height: 48,
+                            padding: "10px 32px",
+                            borderBottom: "1px solid var(--color-border-default)",
+                            borderTop: "1px solid var(--color-border-default)",
+                            background: "var(--color-bg-secondary)",
+                            position: "sticky", top: 0, zIndex: 2,
+                        }}>
+                            <div onClick={onRemoveAll} style={{
+                                display: "flex", alignItems: "center", gap: 20, cursor: "pointer",
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.opacity = ".6"}
+                            onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
+                                <Icon name="minus-circle" size={20} color="var(--color-text-subtle)" />
+                                <span style={{
+                                    fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
+                                    fontWeight: 500, color: "var(--color-text-subtle)",
+                                }}>Remove all</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                {[
+                                    { label: "Business", color: TYPE_DOT.Business },
+                                    { label: "POIs",     color: TYPE_DOT.POI },
+                                    { label: "Area",     color: TYPE_DOT.Area },
+                                ].map(legend => (
+                                    <div key={legend.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                        <div style={{
+                                            width: 8, height: 8, borderRadius: "50%",
+                                            background: legend.color, flexShrink: 0,
+                                        }} />
+                                        <span style={{
+                                            fontSize: 12, fontWeight: 500,
+                                            color: "var(--color-text-subtle)",
+                                        }}>{legend.label}</span>
                                     </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
+                        {/* Rows */}
+                        {items.map((item) => {
+                            const itemType = getItemType(item);
+                            const dot = TYPE_DOT[itemType] || TYPE_DOT.Business;
+                            return (
+                                <div key={item.id} style={{
+                                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                                    padding: "12px 32px", cursor: "default",
+                                    borderBottom: "1px solid var(--color-border-default)",
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = "var(--color-bg-secondary)"}
+                                onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 20, minWidth: 0, flex: "0 1 auto" }}>
+                                        <div onClick={() => onRemove(item.id)} style={{
+                                            cursor: "pointer", display: "flex", alignItems: "center",
+                                            color: "var(--color-text-subtle)",
+                                            transition: "color .15s ease",
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.color = "var(--color-text-danger)"}
+                                        onMouseLeave={e => e.currentTarget.style.color = "var(--color-text-subtle)"}>
+                                            <Icon name="minus-circle" size={20} />
+                                        </div>
+                                        <span style={{
+                                            fontSize: 14, fontWeight: 600, whiteSpace: "nowrap",
+                                            overflow: "hidden", textOverflow: "ellipsis",
+                                        }}>{item.name}</span>
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0, marginLeft: 16 }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <span style={{
+                                                fontSize: 12, fontWeight: 500,
+                                                color: "var(--color-text-subtlest)", whiteSpace: "nowrap",
+                                            }}>{item.category}</span>
+                                            <div style={{
+                                                width: 8, height: 8, borderRadius: "50%",
+                                                background: dot, flexShrink: 0,
+                                            }} />
+                                        </div>
+                                        <div onClick={() => onOpenInfo(item)} style={{
+                                            cursor: "pointer", display: "flex", alignItems: "center",
+                                            color: "var(--color-icon-subtle)",
+                                            transition: "color .15s ease",
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.color = "var(--color-icon-normal)"}
+                                        onMouseLeave={e => e.currentTarget.style.color = "var(--color-icon-subtle)"}>
+                                            <Icon name="arrow-right" size={20} />
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {items.length === 0 && (
+                            <div style={{
+                                padding: "48px 16px", textAlign: "center",
+                                color: "var(--color-text-subtlest)", fontSize: 14,
+                            }}>
+                                No selections yet. Go back to the explorer to select items.
+                            </div>
+                        )}
+                        {/* Bottom spacer for floating cart bar */}
+                        {items.length > 0 && <div style={{ height: 120 }} />}
+                    </div>
+                );
+            }
 
-                        {/* Blue bottom bar — full width */}
-                        <div className={`cart-bar ${count === 0 ? "hidden" : ""}`} style={{
-                            display: "flex", alignItems: "center", justifyContent: "space-between",
-                            padding: 16,
-                        }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <div style={{
-                                    display: "flex", alignItems: "center", justifyContent: "center",
-                                    background: "var(--color-bg-accent-blue-subtler)",
-                                    color: "var(--color-text-selected)",
-                                    fontFamily: "var(--font-mono)", fontWeight: 500,
-                                    fontSize: 14, borderRadius: 8, width: 32, height: 32,
-                                }}>{count}</div>
-                                <span style={{ fontSize: 14, fontWeight: 500, color: "#FFFDF6" }}>
-                                    items selected
-                                </span>
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <button onClick={() => setExpanded(!expanded)} style={{
-                                    padding: "0 16px", borderRadius: 8, height: 40,
-                                    border: "1px solid var(--color-border-accent-blue-subtle, rgba(255,255,255,.35))",
-                                    background: "transparent", cursor: "pointer",
-                                    fontSize: 14, fontWeight: 500, color: "#FFFDF6",
-                                }}>
-                                    {expanded ? "Collapse" : "Review"}
-                                </button>
+            /* ─── CartBar (floating inside explorer panel) ────────── */
+            function CartBar({ count, panelMode, onToggleMode, allChecked, onToggleAll }) {
+                if (count === 0) return null;
+
+                return (
+                    <div style={{
+                        position: "absolute", bottom: 40, left: 36, right: 36,
+                        zIndex: 5, pointerEvents: "auto",
+                        background: "var(--color-bg-accent-blue-subtler, #c6dde8)",
+                        border: "2px solid var(--color-border-selected, #205ea6)",
+                        borderRadius: 16, padding: 16,
+                        animation: "cartBarIn .35s cubic-bezier(.2,0,0,1) both",
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        overflow: "hidden",
+                    }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            <Checkbox checked={allChecked} onChange={onToggleAll} size={20} />
+                            <span style={{
+                                fontSize: 14, fontWeight: 500,
+                                color: "var(--color-text-default)",
+                            }}>{count} selection{count !== 1 ? "s" : ""}</span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                            {panelMode === "selections" && (
                                 <button onClick={() => alert("Items added to Day 1!")} style={{
-                                    padding: "0 16px", borderRadius: 8, height: 40,
-                                    border: "1px solid var(--color-bg-selected-bold)",
-                                    background: "var(--color-bg-accent-blue-default, #e1eceb)", cursor: "pointer",
+                                    padding: "0 12px", borderRadius: 8, height: 32,
+                                    border: "1px solid var(--color-border-selected, #205ea6)",
+                                    background: "var(--color-bg-selected-bold, #205ea6)",
+                                    cursor: "pointer", fontSize: 14, fontWeight: 500,
+                                    color: "var(--color-text-inverse, #FFFDF6)",
+                                }}>Add to Day 1</button>
+                            )}
+                            {panelMode === "search" && (
+                                <span onClick={onToggleMode} style={{
                                     fontSize: 14, fontWeight: 500,
-                                    color: "var(--color-text-selected, #205ea6)",
-                                }}>
-                                    Add items to Day 1
-                                </button>
-                            </div>
+                                    color: "var(--color-text-default)",
+                                    cursor: "pointer",
+                                }}>Review</span>
+                            )}
+                            <button onClick={onToggleMode} style={{
+                                width: 32, height: 32, borderRadius: 8,
+                                border: "1px solid var(--color-border-selected)",
+                                background: "var(--color-bg-accent-blue-subtle)",
+                                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "var(--color-text-selected)",
+                                padding: 0,
+                            }}>
+                                <Icon name={panelMode === "search" ? "chevron-up" : "chevron-down"} size={16} />
+                            </button>
                         </div>
                     </div>
                 );
@@ -1735,7 +1716,7 @@
                 const [searchQuery, setSearchQuery] = useState("");
                 const [filters, setFilters] = useState([]);
                 const [selectedIds, setSelectedIds] = useState(new Set());
-                const [cartExpanded, setCartExpanded] = useState(false);
+                const [panelMode, setPanelMode] = useState("search"); // "search" | "selections"
                 const [openInfoItem, setOpenInfoItem] = useState(null);
 
                 const toggleDark = useCallback(() => {
@@ -1853,47 +1834,133 @@
                             width: 520, flexShrink: 0, display: "flex", flexDirection: "column",
                             position: "relative", borderLeft: "1px solid var(--color-border-default)",
                         }}>
-                            {/* Header */}
-                            <div style={{ padding: "40px 32px 24px" }}>
-                                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                                        <h1 style={{
-                                            fontFamily: "Outfit", fontSize: 18, fontWeight: 600,
-                                            lineHeight: "24px", margin: 0,
-                                        }}>Explorer</h1>
-                                        <button onClick={toggleDark} style={{
-                                            background: "none", border: "none", cursor: "pointer",
-                                            padding: 6, borderRadius: 8, color: "var(--color-icon-subtle)",
-                                            display: "flex", alignItems: "center", justifyContent: "center",
-                                        }}>
-                                            <Icon name={isDark ? "sun" : "moon"} size={18} />
-                                        </button>
-                                    </div>
-                                    <p style={{
-                                        fontSize: 16, color: "var(--color-text-subtle)",
+                            {/* ─── 80px Panel Header ─── */}
+                            <div style={{
+                                height: 80, flexShrink: 0,
+                                display: "flex", alignItems: "center", justifyContent: "space-between",
+                                padding: "0 32px",
+                                borderBottom: "1px solid var(--color-border-default)",
+                                background: "var(--color-bg-primary)",
+                            }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                    {panelMode === "search"
+                                        ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 20.1675L3 5.43246C3 5.1742 3.16526 4.94491 3.41026 4.86325L9 3L15 5L20.2103 3.26325C20.5988 3.13374 21 3.42292 21 3.83246L21 18.5675C21 18.8258 20.8347 19.0551 20.5897 19.1368L15 21L9 19L3.78974 20.7368C3.40122 20.8663 3 20.5771 3 20.1675Z" fill="var(--color-bg-accent-purple-subtler)" />
+                                            <path d="M9 19L3.78974 20.7368C3.40122 20.8663 3 20.5771 3 20.1675L3 5.43246C3 5.1742 3.16526 4.94491 3.41026 4.86325L9 3M9 19L15 21M9 19L9 3M15 21L20.5897 19.1368C20.8347 19.0551 21 18.8258 21 18.5675L21 3.83246C21 3.42292 20.5988 3.13374 20.2103 3.26325L15 5M15 21L15 5M15 5L9 3" stroke="var(--color-text-accent-purple)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                          </svg>
+                                        : <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M8.00065 14.6663C11.6825 14.6663 14.6673 11.6816 14.6673 7.99967C14.6673 4.31778 11.6825 1.33301 8.00065 1.33301C4.31875 1.33301 1.33398 4.31778 1.33398 7.99967C1.33398 11.6816 4.31875 14.6663 8.00065 14.6663Z" fill="var(--color-bg-accent-blue-subtler)" stroke="var(--color-text-selected)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M4.66602 8.33301L6.66602 10.333L11.3327 5.66634" stroke="var(--color-text-selected)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                          </svg>
+                                    }
+                                    <h1 style={{
+                                        fontFamily: "Outfit", fontSize: 18, fontWeight: 600,
                                         lineHeight: "24px", margin: 0,
-                                    }}>
-                                        Search within your account or across Whereabouts' extensive database of
-                                        tourism businesses, organizations, and points of interest.
-                                    </p>
+                                        color: "var(--color-text-default)",
+                                    }}>{panelMode === "search" ? "Explorer" : "My Selections"}</h1>
                                 </div>
-                                <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-                                    <SearchBar value={searchQuery} onChange={setSearchQuery} />
-                                    <FilterBar
-                                        filters={filters}
-                                        onUpdateFilter={updateFilter}
-                                        onRemoveFilter={removeFilter}
-                                    />
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    {panelMode === "selections" ? (
+                                        <button onClick={() => setPanelMode("search")} style={{
+                                            padding: "0 12px", borderRadius: 8, height: 32,
+                                            border: "1px solid var(--color-border-bold, #b7b5ac)",
+                                            background: "var(--color-bg-secondary)",
+                                            cursor: "pointer", fontSize: 14, fontWeight: 500,
+                                            color: "var(--color-text-default)",
+                                        }}>Back to Explorer</button>
+                                    ) : (
+                                        <button onClick={() => {}} style={{
+                                            padding: "0 12px", borderRadius: 8, height: 32,
+                                            border: "1px solid var(--color-border-bold, #b7b5ac)",
+                                            background: "var(--color-bg-secondary)",
+                                            cursor: "pointer", fontSize: 14, fontWeight: 500,
+                                            color: "var(--color-text-default)",
+                                        }}>Close</button>
+                                    )}
+                                    <button onClick={toggleDark} style={{
+                                        background: "none", border: "none", cursor: "pointer",
+                                        padding: 4, borderRadius: 8, color: "var(--color-icon-subtle)",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                    }}>
+                                        <Icon name={isDark ? "sun" : "moon"} size={18} />
+                                    </button>
                                 </div>
                             </div>
 
-                            {/* Results */}
-                            <ResultsList
-                                items={filteredItems}
-                                selectedIds={selectedIds}
-                                onToggle={toggleItem}
-                                onSelectAll={selectAll}
-                                onOpenInfo={setOpenInfoItem}
+                            {/* ─── Search mode content ─── */}
+                            {panelMode === "search" && (
+                                <AnimateOnce key="search"
+                                    animation="panelFadeIn .3s cubic-bezier(.2,0,0,1) both"
+                                    style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+                                    <div style={{ padding: "32px 32px 24px", flexShrink: 0 }}>
+                                        <p style={{
+                                            fontSize: 16, color: "var(--color-text-subtle)",
+                                            lineHeight: "24px", margin: "0 0 24px 0",
+                                        }}>
+                                            Search within your account or across Whereabouts' extensive database of
+                                            tourism businesses, organizations, and points of interest.
+                                        </p>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                                            <SearchBar value={searchQuery} onChange={setSearchQuery} />
+                                            <FilterBar
+                                                filters={filters}
+                                                onUpdateFilter={updateFilter}
+                                                onRemoveFilter={removeFilter}
+                                                cartVisible={selectedItems.length > 0}
+                                            />
+                                        </div>
+                                    </div>
+                                    <ResultsList
+                                        items={filteredItems}
+                                        selectedIds={selectedIds}
+                                        onToggle={toggleItem}
+                                        onSelectAll={selectAll}
+                                        onOpenInfo={setOpenInfoItem}
+                                    />
+                                </AnimateOnce>
+                            )}
+
+                            {/* ─── Selections mode content ─── */}
+                            {panelMode === "selections" && (
+                                <AnimateOnce key="selections"
+                                    animation="panelFadeIn .3s cubic-bezier(.2,0,0,1) both"
+                                    style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+                                    <div style={{ padding: "32px 32px 24px", flexShrink: 0 }}>
+                                        <p style={{
+                                            fontSize: 16, color: "var(--color-text-subtle)",
+                                            lineHeight: "24px", margin: 0,
+                                        }}>
+                                            All the selections you've made throughout your current search.
+                                        </p>
+                                    </div>
+                                    <SelectionsList
+                                        items={selectedItems}
+                                        onRemove={toggleItem}
+                                        onRemoveAll={() => setSelectedIds(new Set())}
+                                        onOpenInfo={setOpenInfoItem}
+                                    />
+                                </AnimateOnce>
+                            )}
+
+                            {/* ─── Bottom fade gradient (only when cart visible) ─── */}
+                            {selectedItems.length > 0 && (
+                                <div style={{
+                                    position: "absolute",
+                                    bottom: 0, left: 0, right: 0,
+                                    height: 260,
+                                    background: "linear-gradient(to bottom, transparent 0%, var(--color-bg-primary) 70%)",
+                                    pointerEvents: "none",
+                                    zIndex: 4,
+                                }} />
+                            )}
+
+                            {/* ─── Floating cart bar ─── */}
+                            <CartBar
+                                count={selectedItems.length}
+                                panelMode={panelMode}
+                                onToggleMode={() => setPanelMode(prev => prev === "search" ? "selections" : "search")}
+                                allChecked={selectedItems.length > 0}
+                                onToggleAll={() => setSelectedIds(new Set())}
                             />
 
                             {/* Dim scrim behind info panel */}
@@ -1912,18 +1979,6 @@
                                 onClose={() => setOpenInfoItem(null)}
                             />
                         </div>
-
-                        {/* ─── Cart scrim + overlay ─────────────────── */}
-                        <div
-                            className={`cart-scrim ${cartExpanded && selectedItems.length > 0 ? "active" : ""}`}
-                            onClick={() => setCartExpanded(false)}
-                        />
-                        <Cart
-                            selectedItems={selectedItems}
-                            onRemove={(id) => toggleItem(id)}
-                            expanded={cartExpanded}
-                            setExpanded={setCartExpanded}
-                        />
                     </div>
                 );
             }
