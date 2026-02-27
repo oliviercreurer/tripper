@@ -1860,6 +1860,13 @@
                                     }}>{panelMode === "search" ? "Explorer" : "My Selections"}</h1>
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <button onClick={toggleDark} style={{
+                                        background: "none", border: "none", cursor: "pointer",
+                                        padding: 4, borderRadius: 8, color: "var(--color-icon-subtle)",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                    }}>
+                                        <Icon name={isDark ? "sun" : "moon"} size={18} />
+                                    </button>
                                     {panelMode === "selections" ? (
                                         <button onClick={() => setPanelMode("search")} style={{
                                             padding: "0 12px", borderRadius: 8, height: 32,
@@ -1877,13 +1884,6 @@
                                             color: "var(--color-text-default)",
                                         }}>Close</button>
                                     )}
-                                    <button onClick={toggleDark} style={{
-                                        background: "none", border: "none", cursor: "pointer",
-                                        padding: 4, borderRadius: 8, color: "var(--color-icon-subtle)",
-                                        display: "flex", alignItems: "center", justifyContent: "center",
-                                    }}>
-                                        <Icon name={isDark ? "sun" : "moon"} size={18} />
-                                    </button>
                                 </div>
                             </div>
 
